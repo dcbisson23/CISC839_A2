@@ -30,7 +30,6 @@ The user will provide the following information:
 Your response must adhere to the following guidelines:
     1. (CRITICAL) You must provide ONLY a valid SQLite query to answer the provided question, and nothing else.
     2. Use ONLY the tables and columns provided in the schema.
-    3. Do not use aliasing (x AS y) unless strictly necessary.
 """)
 # This is used in the prompts for Task 3.
 COT_CONTEXT = ("""

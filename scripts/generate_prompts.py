@@ -1,13 +1,11 @@
 import json
 from tqdm import tqdm
 from transformers import AutoTokenizer
-from argparse import ArgumentParser
-from pathlib import Path
-import config
 
 
 class SpiderPromptBuilder:
-    def __init__(self, tables_path: str, questions_path: str):
+
+    def __init__(self, tables_path: str, questions_path: str, sys_context: str):
         """
         Initializes the builder by loading the Spider dataset files.
         """
@@ -19,6 +17,8 @@ class SpiderPromptBuilder:
 
         # Create a lookup dictionary for quick schema retrieval by db_id
         self.schema_lookup = {db['db_id']: db for db in self.tables_data}
+
+        self.sys_context = sys_context
 
     def _format_schema_to_ddl(self, db_id: str) -> str:
         """
@@ -63,21 +63,17 @@ class SpiderPromptBuilder:
         for i, tbl_name in enumerate(tables):
             cols = ",\n".join(table_columns[i])
             ddl_statements.append(f"CREATE TABLE {tbl_name} (\n{cols}\n);")
-
-        schema_str = f"""```sql\n{"\n".join(ddl_statements)}\n```"""
+        ddl_statements =  "\n".join(ddl_statements)
+        schema_str = f"""```sql\n{ddl_statements}\n```"""
 
         return schema_str
 
-    def build_chat_template(self, question: str, db_id: str, add_cot: bool = False) -> list[dict[str, str]]:
+    def build_chat_template(self, question: str, db_id: str) -> list[dict[str, str]]:
         """
         Constructs the chat template to be applied when prompting the LLM.
         """
         schema_str = self._format_schema_to_ddl(db_id)
-        system_context = config.SYS_CONTEXT
-        if add_cot:
-            # The goal here is to give the model a CoT template to help guide it through answering the question.
-            added_cot_context = config.COT_CONTEXT
-            system_context += added_cot_context
+        system_context = self.sys_context
 
         user_question = f"""DATABASE SCHEMA:\n{schema_str}\nQUESTION: \"{question}\"\n"""
         chat_template = [
@@ -89,13 +85,16 @@ class SpiderPromptBuilder:
     def generate_prompts(self, output_path: str,
                          tokenizer: AutoTokenizer,
                          sample_rate: float = 1.0,
-                         add_cot: bool = False):
+                         offset: int = 0):
         """
         Iterates through dev.json and generates a JSONL file of prompts and ground truth.
         """
         with open(output_path, 'w', encoding='utf-8') as f_out:
             db_sample_accum = {}
             total_samples = 0
+            records = []
+            adding_offset_flag = False
+            offset_counter = 0
             for i, item in tqdm(enumerate(self.questions_data), desc="Generating prompts"):
 
                 db_id = item['db_id']
@@ -108,16 +107,26 @@ class SpiderPromptBuilder:
                 skip_flag = True
                 if db_sample_accum.get(db_id) is None:
                     db_sample_accum[db_id] = 0.0
-                    skip_flag = False
+                    adding_offset_flag = True
                 else:
                     db_sample_accum[db_id] += sample_rate
                     if db_sample_accum[db_id] >= 1.0:
                         db_sample_accum[db_id] -= 1.0
                         skip_flag = False
+
+                # This just offsets the sampling so we can define multiple distinct subsets.
+                if adding_offset_flag:
+                    if offset_counter >= offset:
+                        offset_counter = 0
+                        adding_offset_flag = False
+                        skip_flag = False
+                    else:
+                        offset_counter += 1
+
                 if skip_flag:
                     continue
 
-                chat_template = self.build_chat_template(question, db_id, add_cot=add_cot)
+                chat_template = self.build_chat_template(question, db_id)
 
                 prompt = tokenizer.apply_chat_template(
                     chat_template,
@@ -129,51 +138,9 @@ class SpiderPromptBuilder:
                     "db_id": db_id,
                     "prompt": prompt,
                 }
+                records.append(record)
                 f_out.write(json.dumps(record) + "\n")
                 total_samples += 1
 
         print(f"Successfully generated {total_samples} prompts to {output_path}")
-
-
-# --- Example Usage ---
-if __name__ == "__main__":
-    import config
-    from utils import load_tokenizer
-    parser = ArgumentParser()
-    parser.add_argument("--model",
-                        type=str,
-                        choices=[d.get("model") for d in config.MODELS] + ["all"],
-                        default="all"
-                        )
-    parser.add_argument("--sample_rate",
-                        type=float,
-                        default=config.SAMPLE_RATE
-                        )
-    args = parser.parse_args()
-    model_sel = str(args.model)
-    for model_dict in config.MODELS:
-        model_name = model_dict.get("model")
-
-        if model_sel == model_name or model_sel == "all":
-            output_dir = f"{config.DATA_ROOT}/{model_name}"
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
-            output_path = f"{output_dir}/{config.PROMPTS_FILENAME}"
-            builder = SpiderPromptBuilder(config.TABLES_PATH, config.QUESTIONS_PATH)
-
-            tokenizer = load_tokenizer(model_dict)
-
-            builder.generate_prompts(output_path, tokenizer, args.sample_rate)
-            # This prints the first prompt in the new jsonl, for verification.
-            with open(output_path, 'r') as f:
-                first_record = json.loads(f.readline())
-                print("--- SAMPLE PROMPT ---")
-                print(first_record['prompt'])
-
-            if model_dict.get("can_reason"):
-                cot_output_path = f"{output_dir}/{config.COT_PROMPTS_FILENAME}"
-                builder.generate_prompts(cot_output_path, tokenizer, args.sample_rate, add_cot=True)
-
-                with open(cot_output_path, 'r') as f:
-                    first_record = json.loads(f.readline())
-                    print("--- SAMPLE PROMPT ---")
-                    print(first_record['prompt'])
+        return records

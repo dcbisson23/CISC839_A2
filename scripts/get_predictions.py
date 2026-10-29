@@ -1,8 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
-from argparse import ArgumentParser
 import json
 from tqdm import tqdm
-from scripts.utils import load_model, load_tokenizer
 
 
 class LLMPrompter:
@@ -37,6 +35,7 @@ class LLMPrompter:
             for output_json in existing_outputs:
                 existing_output_record = json.loads(output_json)
                 existing_ids.append(existing_output_record["id"])
+            output_records = []
             for prompt_json in tqdm(prompts, desc=f"Generating responses"):
                 prompt_record = json.loads(prompt_json)
                 id = prompt_record["id"]
@@ -53,50 +52,7 @@ class LLMPrompter:
                     "db_id": db_id,
                     "response": response,
                 }
+                output_records.append(output_record)
                 f_out.write(json.dumps(output_record) + "\n")
         print(f"Successfully wrote {len(prompts)} responses to {output_path}")
-
-
-if __name__ == "__main__":
-    import config
-    parser = ArgumentParser()
-    parser.add_argument("--model",
-                        type=str,
-                        choices=[d.get("model") for d in config.MODELS] + ["all"] + ["all"],
-                        default="all"
-                        )
-    parser.add_argument("--data_root",
-                        type=str,
-                        default=config.DATA_ROOT)
-    parser.add_argument("--prompts_filename",
-                        type=str,
-                        default=config.PROMPTS_FILENAME)
-    parser.add_argument("--responses_filename",
-                        type=str,
-                        default=config.RESPONSES_FILENAME)
-    parser.add_argument("--gen_config_filename",
-                        type=str,
-                        default=config.GEN_CONFIG_FILENAME)
-
-    args = parser.parse_args()
-    model_sel = str(args.model)
-    data_root = str(args.data_root)
-    prompts_filename = str(args.prompts_filename)
-    responses_filename = str(args.responses_filename)
-    config_filename = str(args.gen_config)
-    for model_dict in config.MODELS:
-        if model_sel == model_dict['model'] or model_sel == "all":
-            gen_config_path = f"{data_root}/{model_dict['model']}/{config_filename}"
-            prompts_path = f"{data_root}/{model_dict['model']}/{prompts_filename}"
-            responses_path = f"{data_root}/{model_dict['model']}/{responses_filename}"
-            print("Loading model "+model_dict['model'])
-            model = load_model(model_dict)
-            tokenizer = load_tokenizer(model_dict)
-            prompter = LLMPrompter(model, tokenizer)
-            prompter.load_gen_config(gen_config_path)
-            prompter.run_prompt_pipeline(prompts_path, responses_path)
-
-            if model_dict.get("can_reason"):
-                cot_prompts_path = f"{config.DATA_ROOT}/{model_dict['model']}/{config.COT_PROMPTS_FILENAME}"
-                cot_responses_path = f"{config.DATA_ROOT}/{model_dict['model']}/{config.COT_RESPONSES_FILENAME}"
-                prompter.run_prompt_pipeline(cot_prompts_path, cot_responses_path)
+        return output_records

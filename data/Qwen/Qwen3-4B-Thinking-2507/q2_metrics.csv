@@ -1,6 +1,0 @@
-Row Labels,Average of num_sentences,Average of num_backtracks,Average of backtrack_percent,StdDev of backtrack_percent,Count of id
-easy,45.65,7.09,0.137,0.056,43
-medium,76.69,12.84,0.159,0.049,51
-hard,152.73,24.91,0.161,0.034,22
-extra,151.74,24.74,0.169,0.036,19
-Grand Total,89.76,14.65,0.154,0.049,135
