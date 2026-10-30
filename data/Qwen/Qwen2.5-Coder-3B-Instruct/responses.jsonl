@@ -1,135 +1,135 @@
 {"id": 0, "db_id": "concert_singer", "response": "SELECT COUNT(*) FROM singer"}
-{"id": 8, "db_id": "concert_singer", "response": "```sql\nSELECT DISTINCT T1.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID WHERE T1.Age > 20\n```"}
-{"id": 16, "db_id": "concert_singer", "response": "```sql\nSELECT AVG(Capacity), MAX(Capacity) FROM stadium;\n```"}
-{"id": 24, "db_id": "concert_singer", "response": "```sql\nSELECT T1.Name, T1.Capacity\nFROM stadium AS T1\nJOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID\nWHERE T2.Year >= '2014'\nGROUP BY T1.Name, T1.Capacity\nORDER BY COUNT(T2.concert_ID) DESC\nLIMIT 1;\n```"}
-{"id": 32, "db_id": "concert_singer", "response": "```sql\nSELECT T1.Name FROM stadium AS T1 \nLEFT JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID \nWHERE T2.Year != '2014' OR T2.Year IS NULL\n```"}
-{"id": 40, "db_id": "concert_singer", "response": "SELECT T1.Name, T1.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID INNER JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID INNER JOIN stadium AS T4 ON T3.Stadium_ID = T4.Stadium_ID WHERE T1.Song_Name LIKE '%Hey%'"}
+{"id": 8, "db_id": "concert_singer", "response": "SELECT DISTINCT T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID WHERE T1.Age > 20"}
+{"id": 16, "db_id": "concert_singer", "response": "SELECT MAX(Capacity), AVG(Capacity) FROM stadium"}
+{"id": 24, "db_id": "concert_singer", "response": "```sql\nSELECT T1.Name, T1.Capacity FROM stadium AS T1 INNER JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Year >= '2014' GROUP BY T1.Stadium_ID ORDER BY COUNT(T2.concert_ID) DESC LIMIT 1;\n```"}
+{"id": 32, "db_id": "concert_singer", "response": "SELECT Name FROM stadium WHERE Stadium_ID NOT IN (SELECT Stadium_ID FROM concert WHERE YEAR = '2014')"}
+{"id": 40, "db_id": "concert_singer", "response": "```sql\nSELECT T2.Name, T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID INNER JOIN song AS T6 ON T4.concert_ID = T6.concert_ID WHERE T6.Song_Name LIKE '%Hey%' GROUP BY T1.Singer_ID;\n```"}
 {"id": 45, "db_id": "pets_1", "response": "```sql\nSELECT COUNT(*) FROM Pets WHERE weight > 10;\n```"}
-{"id": 53, "db_id": "pets_1", "response": "```sql\nSELECT COUNT(*) FROM Has_Pet hp \nJOIN Pets p ON hp.PetID = p.PetID \nJOIN Student s ON hp.StuID = s.StuID \nWHERE p.PetType = 'dog' AND s.Sex = 'F';\n```"}
-{"id": 61, "db_id": "pets_1", "response": "```sql\nSELECT S.Major, S.Age\nFROM Student S\nLEFT JOIN Has_Pet HP ON S.StuID = HP.StuID\nLEFT JOIN Pets P ON HP.PetID = P.PetID\nWHERE P.PetType != 'Cat' OR P.PetType IS NULL;\n```"}
-{"id": 69, "db_id": "pets_1", "response": "SELECT PetID, weight FROM Pets WHERE pet_age > 1"}
-{"id": 77, "db_id": "pets_1", "response": "SELECT T1.PetID FROM Has_Pet AS T1 INNER JOIN Student AS T2 ON T1.StuID = T2.StuID WHERE T2.LName = 'Smith'"}
-{"id": 85, "db_id": "pets_1", "response": "SELECT AVG(Age) FROM Student WHERE StuID NOT IN (SELECT StuID FROM Has_Pet)"}
+{"id": 53, "db_id": "pets_1", "response": "```sql\nSELECT COUNT(*) FROM Pets \nJOIN Has_Pet ON Pets.PetID = Has_Pet.PetID \nJOIN Student ON Has_Pet.StuID = Student.StuID \nWHERE Pets.PetType = 'dog' AND Student.Sex = 'F';\n```"}
+{"id": 61, "db_id": "pets_1", "response": "SELECT S.Major, S.Age FROM Student S WHERE S.StuID NOT IN (SELECT H.StuID FROM Has_Pet H JOIN Pets P ON H.PetID = P.PetID WHERE P.PetType = 'Cat')"}
+{"id": 69, "db_id": "pets_1", "response": "```sql\nSELECT PetID, weight FROM Pets WHERE pet_age > 1;\n```"}
+{"id": 77, "db_id": "pets_1", "response": "SELECT T2.PetID FROM Student AS T1 INNER JOIN Has_Pet AS T2 ON T1.StuID = T2.StuID WHERE T1.LName = 'Smith'"}
+{"id": 85, "db_id": "pets_1", "response": "SELECT AVG(T1.Age) FROM Student AS T1 LEFT JOIN Has_Pet AS T2 ON T1.StuID = T2.StuID WHERE T2.StuID IS NULL"}
 {"id": 87, "db_id": "car_1", "response": "SELECT COUNT(*) FROM continents"}
-{"id": 95, "db_id": "car_1", "response": "SELECT Model FROM model_list ORDER BY Horsepower ASC LIMIT 1"}
-{"id": 103, "db_id": "car_1", "response": "```sql\nSELECT DISTINCT T2.Model FROM car_makers AS T1 INNER JOIN model_list AS T2 ON T1.Id = T2.Maker WHERE T1.Year > 1980\n```"}
-{"id": 111, "db_id": "car_1", "response": "```sql\nSELECT T1.Accelerate FROM cars_data AS T1 INNER JOIN car_names AS T2 ON T1.MakeId = T2.MakeId INNER JOIN model_list AS T3 ON T2.Model = T3.Model INNER JOIN car_makers AS T4 ON T3.Maker = T4.Id WHERE T4.Maker = 'AMC' AND T2.Make = 'Hornet Sportabout (sw)';\n```"}
-{"id": 119, "db_id": "car_1", "response": "SELECT MIN(Weight) FROM cars_data WHERE Cylinders = 8 AND YEAR = 1974"}
-{"id": 127, "db_id": "car_1", "response": "SELECT AVG(Weight), Year FROM cars_data GROUP BY Year"}
-{"id": 135, "db_id": "car_1", "response": "```sql\nSELECT AVG(Horsepower) FROM cars_data WHERE YEAR < 1980;\n```"}
+{"id": 95, "db_id": "car_1", "response": "```sql\nSELECT Model FROM model_list WHERE Id = (SELECT Model FROM cars_data ORDER BY Horsepower ASC LIMIT 1)\n```"}
+{"id": 103, "db_id": "car_1", "response": "SELECT DISTINCT T3.Model FROM cars_data AS T1 INNER JOIN model_list AS T2 ON T1.Model = T2.ModelId INNER JOIN car_makers AS T3 ON T2.Maker = T3.Id WHERE T1.Year > 1980"}
+{"id": 111, "db_id": "car_1", "response": "```sql\nSELECT T3.Accelerate FROM car_makers AS T1 INNER JOIN model_list AS T2 ON T1.Id = T2.Maker INNER JOIN car_names AS T3 ON T2.Model = T3.Model WHERE T1.Maker = 'AMC' AND T3.Make = 'Hornet Sportabout';\n```"}
+{"id": 119, "db_id": "car_1", "response": "SELECT MIN(Weight) FROM cars_data WHERE Cylinders = 8 AND Year = 1974"}
+{"id": 127, "db_id": "car_1", "response": "```sql\nSELECT YEAR, AVG(Weight) \nFROM cars_data \nGROUP BY YEAR;\n```"}
+{"id": 135, "db_id": "car_1", "response": "```sql\nSELECT AVG(Horsepower) FROM cars_data WHERE Year < 1980;\n```"}
 {"id": 143, "db_id": "car_1", "response": "SELECT COUNT(*) FROM cars_data WHERE Cylinders > 4"}
-{"id": 151, "db_id": "car_1", "response": "```sql\nSELECT T2.Model FROM car_makers AS T1 INNER JOIN model_list AS T2 ON T1.Id = T2.Maker WHERE T1.FullName = 'General Motors' OR T1.Weight > 3500\n```"}
-{"id": 159, "db_id": "car_1", "response": "```sql\nSELECT COUNT(*) FROM cars_data WHERE Accelerate > (SELECT MAX(Accelerate) FROM cars_data)\n```"}
-{"id": 167, "db_id": "car_1", "response": "```sql\nSELECT T1.MakeId, T2.Make FROM car_names AS T1 INNER JOIN model_list AS T3 ON T1.Model = T3.Model INNER JOIN car_makers AS T2 ON T3.Maker = T2.Id WHERE T2.Horsepower > (SELECT MIN(Horsepower) FROM car_makers) AND T1.Cylinders <= 3\n```"}
-{"id": 175, "db_id": "car_1", "response": "```sql\nSELECT T2.Id, T2.Maker FROM model_list AS T1 INNER JOIN car_makers AS T2 ON T1.Maker = T2.Id GROUP BY T2.Id, T2.Maker HAVING COUNT(T1.Model) >= 2 AND COUNT(DISTINCT T1.MakeId) > 3;\n```"}
-{"id": 179, "db_id": "flight_2", "response": "SELECT Country FROM airlines WHERE Airline = 'JetBlue Airways'"}
-{"id": 187, "db_id": "flight_2", "response": "SELECT COUNT(*) FROM airlines"}
-{"id": 195, "db_id": "flight_2", "response": "SELECT COUNT(*) FROM airlines WHERE Country = 'USA'"}
+{"id": 151, "db_id": "car_1", "response": "```sql\nSELECT T1.Model FROM model_list AS T1 INNER JOIN car_makers AS T2 ON T1.Maker = T2.Id WHERE T2.FullName = 'General Motors' OR T1.MakeId IN (SELECT MakeId FROM cars_data WHERE Weight > 3500)\n```"}
+{"id": 159, "db_id": "car_1", "response": "```sql\nSELECT COUNT(*) FROM cars_data WHERE Accelerate > ( SELECT MAX(Accelerate) FROM cars_data )\n```"}
+{"id": 167, "db_id": "car_1", "response": "```sql\nSELECT T1.MakeId, T1.Make \nFROM car_names AS T1 \nJOIN model_list AS T2 ON T1.Model = T2.Model \nJOIN car_makers AS T3 ON T2.Maker = T3.Id \nWHERE T3.Horsepower > (SELECT MIN(Horsepower) FROM car_makers) \nAND T1.Cylinders <= 3;\n```"}
+{"id": 175, "db_id": "car_1", "response": "```sql\nSELECT Maker, Id FROM car_makers WHERE Id IN (\n  SELECT Maker FROM model_list GROUP BY Maker HAVING COUNT(*) >= 2\n) AND Id IN (\n  SELECT Maker FROM car_makers GROUP BY Maker HAVING COUNT(*) > 3\n)\n```"}
+{"id": 179, "db_id": "flight_2", "response": "```sql\nSELECT T2.Country FROM airlines AS T1 INNER JOIN airports AS T2 ON T1.uid = T2.Airline WHERE T1.Airline = 'JetBlue Airways'\n```"}
+{"id": 187, "db_id": "flight_2", "response": "```sql\nSELECT COUNT(*) FROM airlines;\n```"}
+{"id": 195, "db_id": "flight_2", "response": "```sql\nSELECT COUNT(uid) FROM airlines WHERE Country = 'USA';\n```"}
 {"id": 203, "db_id": "flight_2", "response": "SELECT COUNT(*) FROM flights WHERE SourceAirport = 'APG'"}
-{"id": 211, "db_id": "flight_2", "response": "```sql\nSELECT COUNT(*) FROM flights WHERE SourceAirport IN (SELECT AirportCode FROM airports WHERE City = 'Aberdeen') AND DestAirport IN (SELECT AirportCode FROM airports WHERE City = 'Ashley');\n```"}
-{"id": 219, "db_id": "flight_2", "response": "```sql\nSELECT COUNT(f.FlightNo) \nFROM flights f \nJOIN airports a ON f.DestAirport = a.AirportCode \nJOIN airlines al ON f.Airline = al.uid \nWHERE al.Airline = 'United Airlines' AND a.City = 'Aberdeen';\n```"}
-{"id": 227, "db_id": "flight_2", "response": "```sql\nSELECT AirportCode FROM airports WHERE AirportCode IN (\n  SELECT SourceAirport FROM flights GROUP BY SourceAirport ORDER BY COUNT(*) ASC LIMIT 1\n) INTERSECT SELECT AirportCode FROM airports WHERE AirportCode IN (\n  SELECT DestAirport FROM flights GROUP BY DestAirport ORDER BY COUNT(*) ASC LIMIT 1\n)\n```"}
+{"id": 211, "db_id": "flight_2", "response": "SELECT COUNT(T1.FlightNo) FROM flights AS T1 INNER JOIN airports AS T2 ON T1.SourceAirport = T2.AirportCode INNER JOIN airports AS T3 ON T1.DestAirport = T3.AirportCode WHERE T2.City = 'Aberdeen' AND T3.City = 'Ashley'"}
+{"id": 219, "db_id": "flight_2", "response": "SELECT COUNT(T1.FlightNo) FROM flights AS T1 INNER JOIN airports AS T2 ON T1.DestAirport = T2.AirportCode INNER JOIN airlines AS T3 ON T1.Airline = T3.uid WHERE T3.Airline = 'United Airlines' AND T2.City = 'Aberdeen'"}
+{"id": 227, "db_id": "flight_2", "response": "```sql\nSELECT AirportCode FROM airports WHERE AirportCode IN (\n  SELECT SourceAirport FROM flights GROUP BY SourceAirport ORDER BY COUNT(*) ASC LIMIT 1\n)\nUNION ALL\nSELECT AirportCode FROM airports WHERE AirportCode IN (\n  SELECT DestAirport FROM flights GROUP BY DestAirport ORDER BY COUNT(*) ASC LIMIT 1\n);\n```"}
 {"id": 235, "db_id": "flight_2", "response": "```sql\nSELECT DISTINCT T1.Airline FROM airlines AS T1 INNER JOIN flights AS T2 ON T1.uid = T2.Airline WHERE T2.DestAirport = 'AHD';\n```"}
-{"id": 243, "db_id": "flight_2", "response": "```sql\nSELECT Airline FROM airlines WHERE uid IN (SELECT Airline FROM flights GROUP BY Airline HAVING COUNT(*) < 200)\n```"}
-{"id": 251, "db_id": "flight_2", "response": "```sql\nSELECT T3.FlightNo FROM airports AS T1 INNER JOIN flights AS T2 ON T1.AirportCode = T2.SourceAirport INNER JOIN airlines AS T3 ON T2.Airline = T3.uid WHERE T1.City = 'Aberdeen';\n```"}
+{"id": 243, "db_id": "flight_2", "response": "SELECT Airline FROM airlines WHERE uid IN (SELECT Airline FROM flights GROUP BY Airline HAVING COUNT(*) < 200)"}
+{"id": 251, "db_id": "flight_2", "response": "SELECT T2.FlightNo FROM airports AS T1 INNER JOIN flights AS T2 ON T1.AirportCode = T2.SourceAirport WHERE T1.City = 'Aberdeen'"}
 {"id": 259, "db_id": "employee_hire_evaluation", "response": "SELECT COUNT(*) FROM employee"}
-{"id": 267, "db_id": "employee_hire_evaluation", "response": "```sql\nSELECT LOCATION, COUNT(*) \nFROM shop \nGROUP BY LOCATION;\n```"}
-{"id": 275, "db_id": "employee_hire_evaluation", "response": "```sql\nSELECT Name FROM shop WHERE Number_products > (SELECT AVG(Number_products) FROM shop);\n```"}
-{"id": 283, "db_id": "employee_hire_evaluation", "response": "SELECT T1.Name FROM shop AS T1 INNER JOIN hiring AS T2 ON T1.Shop_ID = T2.Shop_ID GROUP BY T1.Shop_ID ORDER BY COUNT(T2.Employee_ID) DESC LIMIT 1"}
+{"id": 267, "db_id": "employee_hire_evaluation", "response": "SELECT Location, COUNT(*) FROM shop GROUP BY Location"}
+{"id": 275, "db_id": "employee_hire_evaluation", "response": "SELECT Name FROM shop WHERE Number_products > ( SELECT AVG(Number_products) FROM shop )"}
+{"id": 283, "db_id": "employee_hire_evaluation", "response": "SELECT T2.Name FROM hiring AS T1 INNER JOIN shop AS T2 ON T1.Shop_ID = T2.Shop_ID GROUP BY T2.Shop_ID ORDER BY COUNT(T1.Employee_ID) DESC LIMIT 1"}
 {"id": 291, "db_id": "employee_hire_evaluation", "response": "SELECT * FROM hiring"}
-{"id": 297, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT COUNT(*) FROM Documents;\n```"}
-{"id": 305, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT COUNT(DISTINCT T2.Template_ID) FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID;\n```"}
-{"id": 313, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Template_ID FROM Documents GROUP BY Template_ID HAVING COUNT(*) > 1;\n```"}
-{"id": 321, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT DISTINCT Template_Type_Code FROM Templates\n```"}
-{"id": 329, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT T2.Template_Type_Code, COUNT(T1.Template_ID) AS Number_Of_Templates\nFROM Templates AS T1\nJOIN Ref_Template_Types AS T2 ON T1.Template_Type_Code = T2.Template_Type_Code\nGROUP BY T2.Template_Type_Code;\n```"}
-{"id": 337, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT T2.Template_Type_Code FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID WHERE T1.Document_Name = 'Data base'"}
-{"id": 345, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT Template_Type_Code FROM Ref_Template_Types WHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates)"}
-{"id": 353, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT DISTINCT T1.Template_Type_Description FROM Ref_Template_Types AS T1 INNER JOIN Templates AS T2 ON T1.Template_Type_Code = T2.Template_Type_Code INNER JOIN Documents AS T3 ON T2.Template_ID = T3.Template_ID\n```"}
-{"id": 361, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT T3.Paragraph_Text, T3.Other_Details FROM Documents AS T1 INNER JOIN Paragraphs AS T2 ON T1.Document_ID = T2.Document_ID INNER JOIN Templates AS T3 ON T1.Template_ID = T3.Template_ID WHERE T2.Paragraph_Text = 'Korea'"}
-{"id": 369, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Documents.Document_ID, Documents.Document_Name, COUNT(Paragraphs.Paragraph_ID) AS Number_Of_Paragraphs\nFROM Documents\nJOIN Paragraphs ON Documents.Document_ID = Paragraphs.Document_ID\nGROUP BY Documents.Document_ID, Documents.Document_Name;\n```"}
-{"id": 377, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Document_ID FROM Documents WHERE COUNT(Paragraph_ID) BETWEEN 1 AND 2;\n```"}
+{"id": 297, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT COUNT(*) FROM Documents"}
+{"id": 305, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT COUNT(DISTINCT T1.Template_ID) FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID"}
+{"id": 313, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT T.Template_ID FROM Templates AS T JOIN Documents AS D ON T.Template_ID = D.Template_ID GROUP BY T.Template_ID HAVING COUNT(D.Document_ID) > 1;\n```"}
+{"id": 321, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT DISTINCT Template_Type_Code FROM Templates"}
+{"id": 329, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Template_Type_Code, COUNT(*) AS Number_of_Templates\nFROM Templates\nJOIN Ref_Template_Types ON Templates.Template_Type_Code = Ref_Template_Types.Template_Type_Code\nGROUP BY Template_Type_Code;\n```"}
+{"id": 337, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT T1.Template_Type_Code FROM Templates AS T1 INNER JOIN Documents AS T2 ON T1.Template_ID = T2.Template_ID WHERE T2.Document_Name = 'Data base';\n```"}
+{"id": 345, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Template_Type_Code FROM Ref_Template_Types WHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates)\n```"}
+{"id": 353, "db_id": "cre_Doc_Template_Mgt", "response": "SELECT DISTINCT T2.Template_Type_Description FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID"}
+{"id": 361, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT Paragraph_Text, Other_Details FROM Paragraphs WHERE Paragraph_Text = 'Korea ';\n```"}
+{"id": 369, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT \n    D.Document_ID,\n    D.Document_Name,\n    COUNT(P.Paragraph_ID) AS Number_Of_Paragraphs\nFROM \n    Documents D\nJOIN \n    Paragraphs P ON D.Document_ID = P.Document_ID\nGROUP BY \n    D.Document_ID, D.Document_Name;\n```"}
+{"id": 377, "db_id": "cre_Doc_Template_Mgt", "response": "```sql\nSELECT T1.Document_ID FROM Documents AS T1 INNER JOIN Paragraphs AS T2 ON T1.Document_ID = T2.Document_ID GROUP BY T1.Document_ID HAVING COUNT(*) BETWEEN 1 AND 2;\n```"}
 {"id": 381, "db_id": "course_teach", "response": "SELECT COUNT(*) FROM teacher"}
-{"id": 389, "db_id": "course_teach", "response": "```sql\nSELECT Name FROM teacher WHERE Age = '32' OR Age = '33';\n```"}
-{"id": 397, "db_id": "course_teach", "response": "```sql\nSELECT Hometown FROM teacher GROUP BY Hometown HAVING COUNT(*) >= 2;\n```"}
-{"id": 405, "db_id": "course_teach", "response": "```sql\nSELECT T.Name, COUNT(CA.Course_ID) \nFROM teacher AS T \nJOIN course_arrange AS CA ON T.Teacher_ID = CA.Teacher_ID \nGROUP BY T.Name;\n```"}
+{"id": 389, "db_id": "course_teach", "response": "SELECT Name FROM teacher WHERE Age = '32' OR Age = '33'"}
+{"id": 397, "db_id": "course_teach", "response": "SELECT Hometown FROM teacher GROUP BY Hometown HAVING COUNT(*) >= 2"}
+{"id": 405, "db_id": "course_teach", "response": "```sql\nSELECT T.Name, COUNT(C.Course_ID) AS NumberOfCourses \nFROM teacher AS T \nJOIN course_arrange AS CA ON T.Teacher_ID = CA.Teacher_ID \nGROUP BY T.Name;\n```"}
 {"id": 411, "db_id": "museum_visit", "response": "SELECT COUNT(ID) FROM visitor WHERE Age < 30"}
-{"id": 419, "db_id": "museum_visit", "response": "```sql\nSELECT v.ID, v.Name, v.Age\nFROM visitor v\nJOIN visit vis ON v.ID = vis.visitor_ID\nGROUP BY v.ID\nHAVING COUNT(vis.Museum_ID) > 1;\n```"}
-{"id": 427, "db_id": "museum_visit", "response": "SELECT COUNT(ID) FROM visitor WHERE ID NOT IN (SELECT visitor_ID FROM visit WHERE Museum_ID IN (SELECT Museum_ID FROM museum WHERE Open_Year > '2010'))"}
+{"id": 419, "db_id": "museum_visit", "response": "```sql\nSELECT v.ID, v.Name, v.Age\nFROM visitor v\nJOIN visit vi ON v.ID = vi.visitor_ID\nGROUP BY v.ID\nHAVING COUNT(vi.Museum_ID) > 1;\n```"}
+{"id": 427, "db_id": "museum_visit", "response": "SELECT COUNT(*) FROM visitor WHERE ID NOT IN (SELECT visitor_ID FROM visit WHERE Museum_ID IN (SELECT Museum_ID FROM museum WHERE Open_Year > '2010'))"}
 {"id": 429, "db_id": "wta_1", "response": "SELECT COUNT(*) FROM players"}
-{"id": 437, "db_id": "wta_1", "response": "```sql\nSELECT AVG(winner_rank) FROM matches;\n```"}
-{"id": 445, "db_id": "wta_1", "response": "```sql\nSELECT tourney_name FROM matches GROUP BY tourney_name HAVING COUNT(*) > 10\n```"}
+{"id": 437, "db_id": "wta_1", "response": "SELECT AVG(winner_rank) FROM matches"}
+{"id": 445, "db_id": "wta_1", "response": "SELECT tourney_name FROM matches GROUP BY tourney_name HAVING COUNT(*) > 10"}
 {"id": 453, "db_id": "wta_1", "response": "```sql\nSELECT first_name, country_code FROM players ORDER BY birth_date ASC LIMIT 1;\n```"}
-{"id": 461, "db_id": "wta_1", "response": "SELECT YEAR FROM matches GROUP BY YEAR ORDER BY COUNT(*) DESC LIMIT 1"}
-{"id": 469, "db_id": "wta_1", "response": "```sql\nSELECT p.first_name, AVG(r.ranking) AS average_ranking\nFROM players p\nJOIN rankings r ON p.player_id = r.player_id\nGROUP BY p.first_name;\n```"}
+{"id": 461, "db_id": "wta_1", "response": "```sql\nSELECT year FROM matches GROUP BY year ORDER BY COUNT(*) DESC LIMIT 1;\n```"}
+{"id": 469, "db_id": "wta_1", "response": "```sql\nSELECT AVG(ranking), first_name FROM players INNER JOIN rankings ON players.player_id = rankings.player_id GROUP BY first_name;\n```"}
 {"id": 477, "db_id": "wta_1", "response": "```sql\nSELECT country_code FROM players GROUP BY country_code HAVING COUNT(*) > 50;\n```"}
-{"id": 485, "db_id": "wta_1", "response": "```sql\nSELECT COUNT(DISTINCT T1.winner_id) FROM matches AS T1 INNER JOIN players AS T2 ON T1.winner_id = T2.player_id WHERE T1.tourney_name = 'WTA Championships' AND T2.hand = 'L'\n```"}
+{"id": 485, "db_id": "wta_1", "response": "SELECT COUNT(DISTINCT T1.winner_id) FROM matches AS T1 INNER JOIN players AS T2 ON T1.winner_id = T2.player_id WHERE T2.hand = 'L' AND T1.tourney_name = 'WTA Championships'"}
 {"id": 491, "db_id": "battle_death", "response": "SELECT COUNT(*) FROM ship WHERE disposition_of_ship = 'Captured'"}
-{"id": 499, "db_id": "battle_death", "response": "SELECT b.id, b.name FROM battle b WHERE b.id IN (SELECT lost_in_battle FROM ship WHERE caused_by_ship_id IN (SELECT id FROM death WHERE killed > 10))"}
-{"id": 507, "db_id": "student_transcripts_tracking", "response": "SELECT line_1, line_2 FROM Addresses"}
-{"id": 515, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT T2.department_name, T2.department_id\nFROM Degree_Programs AS T1\nJOIN Departments AS T2 ON T1.department_id = T2.department_id\nGROUP BY T2.department_id\nORDER BY COUNT(T1.degree_program_id) DESC\nLIMIT 1;\n```"}
+{"id": 499, "db_id": "battle_death", "response": "```sql\nSELECT DISTINCT b.id, b.name FROM battle b\nJOIN death d ON b.id = d.caused_by_ship_id\nGROUP BY b.id\nHAVING SUM(d.killed) > 10;\n```"}
+{"id": 507, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT line_1, line_2 FROM Addresses;\n```"}
+{"id": 515, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT T2.department_name, T2.department_id FROM Degree_Programs AS T1 INNER JOIN Departments AS T2 ON T1.department_id = T2.department_id GROUP BY T2.department_name ORDER BY COUNT(T1.degree_program_id) DESC LIMIT 1;\n```"}
 {"id": 523, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT section_name, section_description FROM Sections;\n```"}
-{"id": 531, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT department_description FROM Departments WHERE department_name LIKE '%computer%'\n```"}
-{"id": 539, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT degree_program_id, degree_summary_name\nFROM Degree_Programs\nJOIN Student_Enrolment ON Degree_Programs.degree_program_id = Student_Enrolment.degree_program_id\nGROUP BY degree_program_id, degree_summary_name\nORDER BY COUNT(student_enrolment_id) DESC\nLIMIT 1;\n```"}
-{"id": 547, "db_id": "student_transcripts_tracking", "response": "SELECT T1.course_name FROM Courses AS T1 INNER JOIN Student_Enrolment_Courses AS T2 ON T1.course_id = T2.course_id GROUP BY T1.course_name ORDER BY COUNT(T2.student_course_id) DESC LIMIT 1"}
+{"id": 531, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT department_description FROM Departments WHERE department_name LIKE '%computer%';\n```"}
+{"id": 539, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT degree_program_id, degree_summary_name FROM Degree_Programs \nJOIN Student_Enrolment ON Degree_Programs.degree_program_id = Student_Enrolment.degree_program_id \nGROUP BY degree_program_id, degree_summary_name \nORDER BY COUNT(student_id) DESC \nLIMIT 1;\n```"}
+{"id": 547, "db_id": "student_transcripts_tracking", "response": "SELECT T1.course_name FROM Courses AS T1 INNER JOIN Student_Enrolment_Courses AS T2 ON T1.course_id = T2.course_id GROUP BY T2.course_id ORDER BY COUNT(T2.student_course_id) DESC LIMIT 1"}
 {"id": 555, "db_id": "student_transcripts_tracking", "response": "SELECT first_name, middle_name, last_name FROM Students ORDER BY date_first_registered ASC LIMIT 1"}
-{"id": 563, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT AVG(T1.transcript_date) FROM Transcripts AS T1;\n```"}
-{"id": 571, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT student_course_id, COUNT(*) as max_transcript_count\nFROM Transcript_Contents\nGROUP BY student_course_id\nORDER BY max_transcript_count DESC\nLIMIT 1;\n```"}
-{"id": 579, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT * FROM Students ORDER BY last_name DESC, first_name DESC, middle_name DESC;\n```"}
+{"id": 563, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT AVG(transcript_date) FROM Transcripts\n```"}
+{"id": 571, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT student_course_id, COUNT(DISTINCT transcript_id) AS max_transcripts\nFROM Transcript_Contents\nGROUP BY student_course_id\nORDER BY max_transcripts DESC\nLIMIT 1;\n```"}
+{"id": 579, "db_id": "student_transcripts_tracking", "response": "```sql\nSELECT * FROM Students ORDER BY last_name DESC, first_name DESC;\n```"}
 {"id": 585, "db_id": "tvshow", "response": "SELECT Title FROM Cartoon ORDER BY Title ASC"}
-{"id": 593, "db_id": "tvshow", "response": "```sql\nSELECT Title FROM Cartoon WHERE Directed_by IN ('Ben Jones', 'Brandon Vietti');\n```"}
+{"id": 593, "db_id": "tvshow", "response": "```sql\nSELECT Title FROM Cartoon WHERE Directed_by = 'Ben Jones' OR Directed_by = 'Brandon Vietti';\n```"}
 {"id": 601, "db_id": "tvshow", "response": "```sql\nSELECT Package_Option FROM TV_Channel WHERE series_name = 'Sky Radio';\n```"}
 {"id": 609, "db_id": "tvshow", "response": "SELECT T1.series_name FROM TV_Channel AS T1 INNER JOIN Cartoon AS T2 ON T1.id = T2.Channel WHERE T2.Title = 'The Rise of the Blue Beetle!'"}
 {"id": 617, "db_id": "tvshow", "response": "SELECT MIN(Share), MAX(Share) FROM TV_series"}
 {"id": 625, "db_id": "tvshow", "response": "SELECT Episode FROM TV_series WHERE Channel = (SELECT id FROM TV_Channel WHERE series_name = 'Sky Radio')"}
-{"id": 633, "db_id": "tvshow", "response": "```sql\nSELECT DISTINCT T2.Country \nFROM Cartoon AS T1 \nJOIN TV_Channel AS T2 ON T1.Channel = T2.id \nWHERE T1.Written_by = 'Todd Casey';\n```"}
-{"id": 641, "db_id": "tvshow", "response": "```sql\nSELECT id FROM TV_Channel GROUP BY Country HAVING COUNT(*) > 2;\n```"}
+{"id": 633, "db_id": "tvshow", "response": "SELECT T1.Country FROM TV_Channel AS T1 INNER JOIN Cartoon AS T2 ON T1.id = T2.Channel WHERE T2.Written_by = 'Todd Casey'"}
+{"id": 641, "db_id": "tvshow", "response": "```sql\nSELECT Country FROM TV_Channel GROUP BY Country HAVING COUNT(*) > 2;\n```"}
 {"id": 647, "db_id": "poker_player", "response": "SELECT COUNT(*) FROM poker_player"}
-{"id": 655, "db_id": "poker_player", "response": "SELECT Money_Rank FROM poker_player ORDER BY Earnings DESC LIMIT 1"}
-{"id": 663, "db_id": "poker_player", "response": "```sql\nSELECT Name FROM poker_player ORDER BY Final_Table_Made ASC;\n```"}
+{"id": 655, "db_id": "poker_player", "response": "```sql\nSELECT Money_Rank FROM poker_player ORDER BY Earnings DESC LIMIT 1;\n```"}
+{"id": 663, "db_id": "poker_player", "response": "SELECT Name FROM poker_player ORDER BY Final_Table_Made ASC"}
 {"id": 671, "db_id": "poker_player", "response": "SELECT T2.Name FROM poker_player AS T1 INNER JOIN people AS T2 ON T1.People_ID = T2.People_ID ORDER BY T1.Earnings DESC"}
 {"id": 679, "db_id": "poker_player", "response": "SELECT Name, Birth_Date FROM people ORDER BY Name ASC"}
 {"id": 687, "db_id": "voter_1", "response": "SELECT COUNT(DISTINCT state) FROM AREA_CODE_STATE"}
-{"id": 695, "db_id": "voter_1", "response": "```sql\nSELECT T2.contestant_number, T2.contestant_name\nFROM VOTES AS T1\nJOIN CONTESTANTS AS T2 ON T1.contestant_number = T2.contestant_number\nGROUP BY T1.contestant_number, T1.contestant_name\nORDER BY COUNT(T1.vote_id) ASC\nLIMIT 1;\n```"}
-{"id": 702, "db_id": "world_1", "response": "```sql\nSELECT Name FROM country WHERE IndepYear > 1950;\n```"}
-{"id": 710, "db_id": "world_1", "response": "SELECT T1.Region FROM city AS T1 INNER JOIN country AS T2 ON T1.CountryCode = T2.Code WHERE T1.Name = 'Kabul'"}
+{"id": 695, "db_id": "voter_1", "response": "```sql\nSELECT T2.contestant_number, T2.contestant_name FROM VOTES AS T1 INNER JOIN CONTESTANTS AS T2 ON T1.contestant_number = T2.contestant_number GROUP BY T1.contestant_number ORDER BY COUNT(T1.vote_id) ASC LIMIT 1;\n```"}
+{"id": 702, "db_id": "world_1", "response": "```sql\nSELECT Name FROM country WHERE IndepYear > 1950\n```"}
+{"id": 710, "db_id": "world_1", "response": "SELECT T2.Region FROM city AS T1 INNER JOIN country AS T2 ON T1.CountryCode = T2.Code WHERE T1.Name = 'Kabul'"}
 {"id": 718, "db_id": "world_1", "response": "```sql\nSELECT AVG(LifeExpectancy) FROM country WHERE Region = 'Central Africa';\n```"}
-{"id": 726, "db_id": "world_1", "response": "SELECT SUM(SurfaceArea) FROM country WHERE Continent IN ('Asia', 'Europe')"}
+{"id": 726, "db_id": "world_1", "response": "```sql\nSELECT SUM(SurfaceArea) FROM country WHERE Continent IN ('Asia', 'Europe');\n```"}
 {"id": 734, "db_id": "world_1", "response": "SELECT COUNT(DISTINCT GovernmentForm) FROM country WHERE Continent = 'Africa'"}
-{"id": 742, "db_id": "world_1", "response": "SELECT T2.Continent FROM countrylanguage AS T1 INNER JOIN country AS T2 ON T1.CountryCode = T2.Code GROUP BY T2.Continent ORDER BY COUNT(T1.Language) DESC LIMIT 1"}
+{"id": 742, "db_id": "world_1", "response": "```sql\nSELECT T1.Continent FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode GROUP BY T1.Continent ORDER BY COUNT(DISTINCT T2.Language) DESC LIMIT 1;\n```"}
 {"id": 750, "db_id": "world_1", "response": "```sql\nSELECT COUNT(DISTINCT T2.Continent) FROM countrylanguage AS T1 INNER JOIN country AS T2 ON T1.CountryCode = T2.Code WHERE T1.Language = 'Chinese'\n```"}
 {"id": 758, "db_id": "world_1", "response": "```sql\nSELECT T2.Language FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T1.GovernmentForm = 'Republic' GROUP BY T2.Language HAVING COUNT(T1.Code) = 1;\n```"}
-{"id": 766, "db_id": "world_1", "response": "```sql\nSELECT SUM(T2.Population) \nFROM countrylanguage AS T1 \nJOIN country AS T2 ON T1.CountryCode = T2.Code \nWHERE T1.Language != 'English' AND T1.IsOfficial = 'F';\n```"}
-{"id": 774, "db_id": "world_1", "response": "```sql\nSELECT Name FROM country WHERE Continent = 'Africa' AND Population < (SELECT MIN(Population) FROM country WHERE Continent = 'Asia')\n```"}
-{"id": 782, "db_id": "world_1", "response": "```sql\nSELECT Code FROM country WHERE GovernmentForm != 'Republic' AND Language != 'English'\n```"}
-{"id": 790, "db_id": "world_1", "response": "```sql\nSELECT T2.Population, T2.Name, T2.HeadOfState FROM country AS T1 INNER JOIN city AS T2 ON T1.Code = T2.CountryCode ORDER BY T1.SurfaceArea DESC LIMIT 1;\n```"}
-{"id": 798, "db_id": "world_1", "response": "```sql\nSELECT T2.Continent, AVG(T1.LifeExpectancy) AS AverageLifeExpectancy, SUM(T1.Population) AS TotalPopulation\nFROM country AS T1\nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode\nGROUP BY T2.Continent\nHAVING AVG(T1.LifeExpectancy) < 72;\n```"}
-{"id": 806, "db_id": "world_1", "response": "```sql\nSELECT COUNT(*) FROM country WHERE Continent = 'Asia';\n```"}
-{"id": 814, "db_id": "world_1", "response": "SELECT T2.Language FROM countrylanguage AS T1 INNER JOIN country AS T2 ON T1.CountryCode = T2.Code GROUP BY T2.Language ORDER BY COUNT(T1.CountryCode) DESC LIMIT 1"}
+{"id": 766, "db_id": "world_1", "response": "SELECT SUM(T2.Population) FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language != 'English'"}
+{"id": 774, "db_id": "world_1", "response": "```sql\nSELECT T1.Name \nFROM country AS T1 \nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode \nWHERE T1.Continent = 'Africa' \nAND T1.Population < ALL \n(SELECT MIN(Population) \n FROM country \n WHERE Continent = 'Asia');\n```"}
+{"id": 782, "db_id": "world_1", "response": "```sql\nSELECT T1.Code FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language != 'English' AND T1.GovernmentForm != 'Republic'\n```"}
+{"id": 790, "db_id": "world_1", "response": "```sql\nSELECT T2.Population, T1.Name, T1.HeadOfState FROM country AS T1 INNER JOIN city AS T2 ON T1.Code = T2.CountryCode ORDER BY T1.SurfaceArea DESC LIMIT 1;\n```"}
+{"id": 798, "db_id": "world_1", "response": "```sql\nSELECT c.Continent, AVG(c.LifeExpectancy) AS AvgLifeExp, SUM(c.Population) AS TotalPop\nFROM country c\nGROUP BY c.Continent\nHAVING AVG(c.LifeExpectancy) < 72;\n```"}
+{"id": 806, "db_id": "world_1", "response": "SELECT COUNT(*) FROM country WHERE Continent = 'Asia'"}
+{"id": 814, "db_id": "world_1", "response": "SELECT Language FROM countrylanguage GROUP BY Language ORDER BY COUNT(*) DESC LIMIT 1"}
 {"id": 822, "db_id": "orchestra", "response": "SELECT COUNT(*) FROM conductor"}
 {"id": 830, "db_id": "orchestra", "response": "SELECT AVG(Attendance) FROM show"}
-{"id": 838, "db_id": "orchestra", "response": "```sql\nSELECT Name FROM conductor ORDER BY Year_of_Work DESC LIMIT 1;\n```"}
+{"id": 838, "db_id": "orchestra", "response": "SELECT Name FROM conductor ORDER BY Year_of_Work DESC LIMIT 1"}
 {"id": 846, "db_id": "orchestra", "response": "```sql\nSELECT T1.Name FROM conductor AS T1 INNER JOIN orchestra AS T2 ON T1.Conductor_ID = T2.Conductor_ID WHERE T2.Year_of_Founded > 2008;\n```"}
-{"id": 854, "db_id": "orchestra", "response": "```sql\nSELECT O.Orchestra FROM orchestra O WHERE NOT EXISTS (SELECT 1 FROM performance P WHERE P.Orchestra_ID = O.Orchestra_ID)\n```"}
+{"id": 854, "db_id": "orchestra", "response": "SELECT T1.Orchestra FROM orchestra AS T1 LEFT JOIN performance AS T2 ON T1.Orchestra_ID = T2.Orchestra_ID WHERE T2.Performance_ID IS NULL"}
 {"id": 862, "db_id": "network_1", "response": "SELECT COUNT(*) FROM Highschooler"}
-{"id": 870, "db_id": "network_1", "response": "SELECT name FROM Highschooler WHERE grade = 10"}
-{"id": 878, "db_id": "network_1", "response": "```sql\nSELECT grade FROM Highschooler GROUP BY grade ORDER BY COUNT(*) DESC LIMIT 1;\n```"}
-{"id": 886, "db_id": "network_1", "response": "SELECT T1.name FROM Highschooler AS T1 JOIN Friend AS T2 ON T1.ID = T2.student_id GROUP BY T1.name ORDER BY COUNT(T2.friend_id) DESC LIMIT 1"}
-{"id": 894, "db_id": "network_1", "response": "```sql\nSELECT ID FROM Highschooler WHERE ID NOT IN (SELECT friend_id FROM Friend)\n```"}
-{"id": 902, "db_id": "network_1", "response": "```sql\nSELECT student_id, COUNT(*) AS num_likes\nFROM Likes\nGROUP BY student_id;\n```"}
-{"id": 910, "db_id": "network_1", "response": "```sql\nSELECT H.name FROM Highschooler H WHERE H.grade > 5 AND H.ID IN (SELECT F.student_id FROM Friend F GROUP BY F.student_id HAVING COUNT(F.friend_id) >= 2)\n```"}
-{"id": 918, "db_id": "dog_kennels", "response": "SELECT T1.state FROM Owners AS T1 INNER JOIN Professionals AS T2 ON T1.state = T2.state GROUP BY T1.state HAVING COUNT(T1.owner_id) > 0 AND COUNT(T2.professional_id) > 0"}
-{"id": 926, "db_id": "dog_kennels", "response": "```sql\nSELECT DISTINCT T1.first_name \nFROM Owners AS T1 \nUNION \nSELECT DISTINCT T2.first_name \nFROM Professionals AS T2 \nEXCEPT \nSELECT DISTINCT T3.name \nFROM Dogs AS T3;\n```"}
-{"id": 934, "db_id": "dog_kennels", "response": "SELECT T1.breed_name FROM Breeds AS T1 INNER JOIN Dogs AS T2 ON T1.breed_code = T2.breed_code GROUP BY T1.breed_name ORDER BY COUNT(T2.dog_id) DESC LIMIT 1"}
-{"id": 942, "db_id": "dog_kennels", "response": "```sql\nSELECT T2.professional_id, T2.cell_number\nFROM Treatment_Types AS T1\nJOIN Treatments AS T2 ON T1.treatment_type_code = T2.treatment_type_code\nGROUP BY T2.professional_id\nHAVING COUNT(DISTINCT T1.treatment_type_code) >= 2;\n```"}
-{"id": 950, "db_id": "dog_kennels", "response": "```sql\nSELECT o.first_name, o.last_name, s.size_description\nFROM Owners o\nJOIN Dogs d ON o.owner_id = d.owner_id\nJOIN Sizes s ON d.size_code = s.size_code;\n```"}
+{"id": 870, "db_id": "network_1", "response": "```sql\nSELECT name FROM Highschooler WHERE grade = 10;\n```"}
+{"id": 878, "db_id": "network_1", "response": "SELECT grade FROM Highschooler GROUP BY grade ORDER BY COUNT(*) DESC LIMIT 1"}
+{"id": 886, "db_id": "network_1", "response": "SELECT T1.name FROM Highschooler AS T1 JOIN Friend AS T2 ON T1.ID = T2.student_id GROUP BY T1.ID ORDER BY COUNT(T2.friend_id) DESC LIMIT 1"}
+{"id": 894, "db_id": "network_1", "response": "SELECT ID FROM Highschooler WHERE ID NOT IN (SELECT friend_id FROM Friend)"}
+{"id": 902, "db_id": "network_1", "response": "```sql\nSELECT student_id, COUNT(*) AS like_count FROM Likes GROUP BY student_id;\n```"}
+{"id": 910, "db_id": "network_1", "response": "SELECT T1.name FROM Highschooler AS T1 INNER JOIN Friend AS T2 ON T1.ID = T2.student_id GROUP BY T1.ID HAVING COUNT(T2.friend_id) >= 2 AND T1.grade > 5"}
+{"id": 918, "db_id": "dog_kennels", "response": "```sql\nSELECT T1.state FROM Owners AS T1 INNER JOIN Professionals AS T2 ON T1.owner_id = T2.professional_id GROUP BY T1.state HAVING COUNT(DISTINCT T1.owner_id) > 0 AND COUNT(DISTINCT T2.professional_id) > 0;\n```"}
+{"id": 926, "db_id": "dog_kennels", "response": "SELECT T1.first_name FROM Owners AS T1 INNER JOIN Dogs AS T2 ON T1.owner_id = T2.owner_id UNION SELECT T1.first_name FROM Professionals AS T1 INNER JOIN Dogs AS T2 ON T1.professional_id = T2.dog_id EXCEPT SELECT T1.name FROM Dogs AS T1"}
+{"id": 934, "db_id": "dog_kennels", "response": "```sql\nSELECT B.breed_name FROM Breeds B\nJOIN Dogs D ON B.breed_code = D.breed_code\nGROUP BY B.breed_name\nORDER BY COUNT(D.dog_id) DESC\nLIMIT 1;\n```"}
+{"id": 942, "db_id": "dog_kennels", "response": "```sql\nSELECT professional_id, cell_number\nFROM Professionals\nWHERE professional_id IN (\n    SELECT professional_id\n    FROM Treatments\n    GROUP BY professional_id\n    HAVING COUNT(DISTINCT treatment_type_code) >= 2\n)\n```"}
+{"id": 950, "db_id": "dog_kennels", "response": "```sql\nSELECT Owners.first_name, Owners.last_name, Sizes.size_description \nFROM Owners \nJOIN Dogs ON Owners.owner_id = Dogs.owner_id \nJOIN Sizes ON Dogs.size_code = Sizes.size_code;\n```"}
 {"id": 958, "db_id": "dog_kennels", "response": "```sql\nSELECT T1.date_arrived, T1.date_departed \nFROM Dogs AS T1 \nJOIN Treatments AS T2 ON T1.dog_id = T2.dog_id;\n```"}
-{"id": 966, "db_id": "dog_kennels", "response": "SELECT COUNT(DISTINCT dog_id) FROM Treatments"}
-{"id": 974, "db_id": "dog_kennels", "response": "```sql\nSELECT COUNT(*) FROM Dogs WHERE age < (SELECT AVG(age) FROM Dogs)\n```"}
-{"id": 982, "db_id": "dog_kennels", "response": "SELECT COUNT(professional_id) FROM Professionals WHERE professional_id NOT IN (SELECT professional_id FROM Treatments)"}
-{"id": 990, "db_id": "dog_kennels", "response": "SELECT charge_type, charge_amount FROM Charges"}
-{"id": 998, "db_id": "dog_kennels", "response": "```sql\nSELECT T2.first_name, T3.treatment_type_description FROM Treatments AS T1 INNER JOIN Professionals AS T2 ON T1.professional_id = T2.professional_id INNER JOIN Treatment_Types AS T3 ON T1.treatment_type_code = T3.treatment_type_code;\n```"}
+{"id": 966, "db_id": "dog_kennels", "response": "SELECT COUNT(*) FROM Dogs WHERE dog_id IN (SELECT dog_id FROM Treatments)"}
+{"id": 974, "db_id": "dog_kennels", "response": "SELECT COUNT(*) FROM Dogs WHERE age < (SELECT AVG(age) FROM Dogs)"}
+{"id": 982, "db_id": "dog_kennels", "response": "```sql\nSELECT COUNT(*) FROM Professionals WHERE professional_id NOT IN (SELECT professional_id FROM Treatments)\n```"}
+{"id": 990, "db_id": "dog_kennels", "response": "```sql\nSELECT charge_type, charge_amount FROM Charges;\n```"}
+{"id": 998, "db_id": "dog_kennels", "response": "```sql\nSELECT T1.first_name, T3.treatment_type_description FROM Professionals AS T1 INNER JOIN Treatments AS T2 ON T1.professional_id = T2.professional_id INNER JOIN Treatment_Types AS T3 ON T2.treatment_type_code = T3.treatment_type_code;\n```"}
 {"id": 1000, "db_id": "singer", "response": "SELECT COUNT(*) FROM singer"}
-{"id": 1008, "db_id": "singer", "response": "```sql\nSELECT Name FROM singer WHERE Birth_Year = 1948 OR Birth_Year = 1949;\n```"}
+{"id": 1008, "db_id": "singer", "response": "SELECT Name FROM singer WHERE Birth_Year = 1948 OR Birth_Year = 1949"}
 {"id": 1016, "db_id": "singer", "response": "```sql\nSELECT Citizenship, MAX(Net_Worth_Millions) AS Max_Net_Worth\nFROM singer\nGROUP BY Citizenship;\n```"}
-{"id": 1024, "db_id": "singer", "response": "```sql\nSELECT s.Name, SUM(sg.Sales) AS Total_Sales\nFROM singer s\nJOIN song sg ON s.Singer_ID = sg.Singer_ID\nGROUP BY s.Name;\n```"}
+{"id": 1024, "db_id": "singer", "response": "```sql\nSELECT s.Name, SUM(s.song.Sales) as Total_Sales\nFROM singer s\nJOIN song ON s.Singer_ID = song.Singer_ID\nGROUP BY s.Name;\n```"}
 {"id": 1030, "db_id": "real_estate_properties", "response": "SELECT COUNT(DISTINCT feature_id) FROM Other_Available_Features"}
