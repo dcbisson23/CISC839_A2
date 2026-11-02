@@ -195,14 +195,15 @@ class ExampleRetrieverTool:
 
     def forward(self, question: str) -> list[str]:
         q_embedding = self.encoder.encode(question).reshape(1, -1)
-        example_embeddings = list(self.embeddings.values())
+        example_embeddings = np.array(list(self.embeddings.values()))
         similarities = cosine_similarity(q_embedding, example_embeddings)
-        top_k_embeddings = np.top_k(similarities, k=self.k, axis=1)
+        top_k_indices = np.argpartition(similarities, -self.k, axis=1)[0][-self.k:]
         top_examples = []
-        for val, idx in top_k_embeddings:
+        for idx in top_k_indices.tolist():
             ex_question = self.examples[idx]["question"]
+            ex_val = similarities[0][idx]
             ex_query = self.examples[idx]["query"]
-            top_examples.append(f"Question: {ex_question}\nCosine Similarity: {val}\nQuery: {ex_query}")
+            top_examples.append(f"Question: {ex_question}\nCosine Similarity: {ex_val}\nQuery: {ex_query}")
         return top_examples
 
 
