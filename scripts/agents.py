@@ -194,7 +194,7 @@ class ExampleRetrieverTool:
         self.examples = examples
 
     def forward(self, question: str) -> list[str]:
-        q_embedding = self.encoder.encode(question)
+        q_embedding = self.encoder.encode(question).reshape(1, -1)
         example_embeddings = list(self.embeddings.values())
         similarities = cosine_similarity(q_embedding, example_embeddings)
         top_k_embeddings = np.top_k(similarities, k=self.k, axis=1)
