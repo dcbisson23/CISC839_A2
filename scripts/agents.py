@@ -161,7 +161,7 @@ class TableSelectorTool(Tool):
         return similar_tables
 
 
-class ExampleRetrieverTool:
+class ExampleRetrieverTool(Tool):
     name = "example_retriever"
     description = "For a given question, finds 3 similar examples and returns the example question, similarity score (1 is best) and example query, in that order, for each."
     inputs = {
