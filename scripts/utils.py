@@ -3,7 +3,7 @@ from smolagents import CodeAgent, TransformersModel, tool
 import gc
 import torch
 import json
-
+from tqdm import tqdm
 
 def load_model(model_dict:dict) -> AutoModelForCausalLM:
     model_name = model_dict.get("model")
@@ -18,7 +18,7 @@ def load_tokenizer(model_dict:dict) -> AutoTokenizer:
     return tokenizer
 
 
-def load_gen_config(self, gen_config_path:str) -> dict:
+def load_gen_config(gen_config_path:str) -> dict:
     with open(gen_config_path, 'r') as f:
         gen_config = json.load(f)
     return gen_config
@@ -30,6 +30,50 @@ def unload_model(model):
     del model
     gc.collect()
     torch.cuda.empty_cache()
+
+
+def get_questions(questions_path: str, sample_rate: float, offset: int=0):
+    with open(questions_path, 'r') as f:
+        questions_data = json.load(f)
+
+    db_sample_accum = {}
+    total_samples = 0
+    questions = []
+    adding_offset_flag = False
+    offset_counter = 0
+    for idx, item in tqdm(enumerate(questions_data), desc="Generating prompts"):
+
+        db_id = item['db_id']
+        # We only want a # of samples for each db proportional to the # of questions available to the db.
+        # So, take the first question for each db, then only take questions when enough questions have gone by.
+        # Ex:
+        # - for sample_rate = 1, take every question.
+        # - for sample_rate = 0.5, take every other question.
+        skip_flag = True
+        if db_sample_accum.get(db_id) is None:
+            db_sample_accum[db_id] = 0.0
+            adding_offset_flag = True
+        else:
+            db_sample_accum[db_id] += sample_rate
+            if db_sample_accum[db_id] >= 1.0:
+                db_sample_accum[db_id] -= 1.0
+                skip_flag = False
+
+        # This just offsets the sampling so we can define multiple distinct subsets.
+        if adding_offset_flag:
+            if offset_counter >= offset:
+                offset_counter = 0
+                adding_offset_flag = False
+                skip_flag = False
+            else:
+                offset_counter += 1
+
+        if skip_flag:
+            continue
+        question = item['question']
+
+        questions.append({"id": idx, "db_id": db_id, "question": question})
+    return questions
 
 
 def get_data_from_response(response: str) -> dict:
