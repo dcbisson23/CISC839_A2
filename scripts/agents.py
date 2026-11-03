@@ -210,12 +210,19 @@ class AgentHarness:
         self.tools = tools
         self.agent = ToolCallingAgent(
             tools=self.tools,
-            model=self.engine
+            model=self.engine,
+            stream_outputs=
         )
 
-    def run(self, question: str, db_id: str, task: str, return_full_result: bool = False) -> RunResult:
+    def run(self,
+            question: str,
+            db_id: str,
+            task: str,
+            stream_outputs: bool = False,
+            return_full_result: bool = False) -> RunResult:
         result = self.agent.run(
             task=task,
+            stream=stream_outputs,
             additional_args={
                 "question": question,
                 "db_id": db_id
