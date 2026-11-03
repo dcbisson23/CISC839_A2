@@ -23,7 +23,8 @@ def get_schema(db_path: str) -> str:
 
 class QueryTool(Tool):
     name = "query_db"
-    description = "Allows for queries to be executed on a database specified by db_id. Returns the results of the query."
+    description = ("Allows for queries to be tested on a database specified by db_id. "
+                   "Use this to verify an SQL query on the database before final submission.")
     inputs = {
         "query": {
             "type": "string",
@@ -59,7 +60,7 @@ class QueryTool(Tool):
 
 class GetSchemaTool(Tool):
     name = "get_schema"
-    description = "Allows for viewing the SQL schema of a database specified by db_id."
+    description = "Returns the full SQL schema of a database specified by db_id."
     inputs = {
         "db_id": {
             "type": "string",
@@ -84,15 +85,13 @@ class GetSchemaTool(Tool):
 
 class TableSelectorTool(Tool):
     name = "select_tables"
-    description = "Given a database ID, a threshold value and a natural-language question, returns schema information for only the tables sufficiently relevant to the question"
+    description = ("Given a database ID, a threshold value and a natural-language question, "
+                   "returns the table schemas in order of most to least relevant to the question."
+                   "Prioritize using the most relevant tables when generating the SQL query to answer the question.")
     inputs = {
         "db_id": {
             "type": "string",
             "description": "The database ID."
-        },
-        "threshold": {
-            "type": "number",
-            "description": "The threshold value for determining whether a table is relevant. Should be between 0 and 1. 0.2 is the recommended starting value."
         },
         "question": {
             "type": "string",
@@ -113,57 +112,44 @@ class TableSelectorTool(Tool):
             db_schema = f.read()
         statements = sqlparse.split(db_schema)
         tables = []
-        for statement in statements:
+        embeddings = []
+        for idx, statement in enumerate(statements):
             if statement.startswith("CREATE TABLE"):
                 table_name = statement.split('"')[1]
                 table_embedding = self.encoder.encode(statement)
-                tables.append({"table_name": table_name, "schema": statement, "embedding": table_embedding})
-        self.dbs[db_id] = tables
-
-    # def _setup_db_info(self, db_id: str):
-    #     full = parse_from_file(f'{self.db_root}/{db_id}/schema.sql')
-    #
-    #     table_keys = {"table_name", "primary_key", "columns"}
-    #     column_keys = {"name", "type", "references", "unique"}
-    #     references_keys = {"table", "column"}
-    #
-    #     tables = []
-    #     for table_dict in full:
-    #         table = {k: table_dict[k] for k in table_keys if k in table_dict}
-    #         columns = []
-    #         for col_dict in table["columns"]:
-    #             column = {k: col_dict[k] for k in column_keys if k in col_dict}
-    #             if column["references"] is not None:
-    #                 column["references"] = {k: column["references"][k] for k in references_keys if
-    #                                         k in column["references"]}
-    #             columns.append(column)
-    #         table["columns"] = columns
-    #         table_embedding = self.encoder.encode(str(table))
-    #         table_description = f"Table: {table['table_name']}\n"
-    #         table_description += "Columns:\n" + "\n".join([f"  - {col['name']}: {col['type']}" for col in columns])
-    #         tables.append({"table_name": table["table_name"], "schema": table_description, "embedding": table_embedding})
-    #     self.dbs[db_id] = tables
+                tables.append({"table_name": table_name, "schema": statement})
+                embeddings.append(table_embedding)
+        self.dbs[db_id] = {"tables": tables, "embeddings": embeddings}
 
     def _get_db_info(self, db_id: str):
         if db_id not in self.dbs.keys():
             self._setup_db_info(db_id)
         return self.dbs[db_id]
 
-    def forward(self, db_id: str, threshold: float, question: str) -> list[str]:
+    def forward(self, db_id: str, question: str) -> list[str]:
         question_embedding = self.encoder.encode(question)
-        tables = self._get_db_info(db_id)
+        db_info = self._get_db_info(db_id)
+        tables = db_info["tables"]
+        table_embeddings = np.array(db_info["embeddings"])
+        similarities = cosine_similarity(question_embedding, table_embeddings)
+        sorted_indices = np.argsort(similarities)[::-1]
+        sorted_tables = []
+        for idx in sorted_indices:
+            sorted_tables.append(tables[idx]["schema"])
 
-        similar_tables = []
-        for table in tables:
-            if cosine_similarity(table["embedding"].reshape(1, -1), question_embedding.reshape(1, -1)) >= threshold:
-                similar_tables.append(table["schema"])
-
-        return similar_tables
+        return sorted_tables
 
 
 class ExampleRetrieverTool(Tool):
     name = "example_retriever"
-    description = "For a given question, finds 3 similar examples and returns the example question, similarity score (1 is best) and example query, in that order, for each."
+    description = ("For a given natural-language question to be converted to an SQL query, "
+                   "finds 3 examples of similar questions and SQL queries that answer them. "
+                   "For each example, returns the example question, "
+                   "an SQL query that answers the question, "
+                   "and the similarity score that measures how similar the example question is to the original question (1 is best), "
+                   "in that order."
+                   "Use this tool to get good examples of how similar questions are converted into SQL queries, "
+                   "to help inform generation of an SQL query for the provided question.")
     inputs = {
         "question": {
             "type": "string",
