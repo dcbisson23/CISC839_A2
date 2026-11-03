@@ -213,9 +213,9 @@ class AgentHarness:
             model=self.engine
         )
 
-    def run(self, question: str, db_id: str, return_full_result: bool = False) -> RunResult:
+    def run(self, question: str, db_id: str, task: str, return_full_result: bool = False) -> RunResult:
         result = self.agent.run(
-            task="Produce a valid SQL query on the database specified db_id that answers the given natural language question.",
+            task=task,
             additional_args={
                 "question": question,
                 "db_id": db_id
