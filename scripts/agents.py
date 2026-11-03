@@ -24,7 +24,8 @@ def get_schema(db_path: str) -> str:
 class QueryTool(Tool):
     name = "query_db"
     description = ("Allows for queries to be tested on a database specified by db_id. "
-                   "Use this to verify an SQL query on the database before final submission.")
+                   "Use this to verify an SQL query on the database before final submission. "
+                   "NOTE: Remember that the final submission is meant to be the query itself, not the result of the query.")
     inputs = {
         "query": {
             "type": "string",
