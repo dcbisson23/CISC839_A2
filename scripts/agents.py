@@ -83,8 +83,8 @@ class GetSchemaTool(Tool):
         return schema
 
 
-class TableSelectorTool(Tool):
-    name = "select_tables"
+class TableOrdererTool(Tool):
+    name = "order_tables"
     description = ("Given a database ID, a threshold value and a natural-language question, "
                    "returns the table schemas in order of most to least relevant to the question."
                    "Prioritize using the most relevant tables when generating the SQL query to answer the question.")
@@ -127,14 +127,14 @@ class TableSelectorTool(Tool):
         return self.dbs[db_id]
 
     def forward(self, db_id: str, question: str) -> list[str]:
-        question_embedding = self.encoder.encode(question)
+        question_embedding = np.array(self.encoder.encode(question)).reshape(1, -1)
         db_info = self._get_db_info(db_id)
         tables = db_info["tables"]
         table_embeddings = np.array(db_info["embeddings"])
         similarities = cosine_similarity(question_embedding, table_embeddings)
         sorted_indices = np.argsort(similarities)[::-1]
         sorted_tables = []
-        for idx in sorted_indices:
+        for idx in sorted_indices[0]:
             sorted_tables.append(tables[idx]["schema"])
 
         return sorted_tables
@@ -187,9 +187,9 @@ class ExampleRetrieverTool(Tool):
         top_examples = []
         for idx in top_k_indices.tolist():
             ex_question = self.examples[idx]["question"]
-            ex_val = similarities[0][idx]
             ex_query = self.examples[idx]["query"]
-            top_examples.append(f"Question: {ex_question}\nCosine Similarity: {ex_val}\nQuery: {ex_query}")
+            ex_val = similarities[0][idx]
+            top_examples.append(f"Question: {ex_question}\nQuery: {ex_query}\nCosine Similarity: {ex_val}")
         return top_examples
 
 
