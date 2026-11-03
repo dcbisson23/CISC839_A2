@@ -24,8 +24,7 @@ def get_schema(db_path: str) -> str:
 class QueryTool(Tool):
     name = "query_db"
     description = ("Allows for queries to be tested on a database specified by db_id. "
-                   "Use this to verify an SQL query on the database before final submission. "
-                   "NOTE: Remember that the final submission is meant to be the query itself, not the result of the query.")
+                   "Use this to verify an SQL query works on the database.")
     inputs = {
         "query": {
             "type": "string",
@@ -56,7 +55,9 @@ class QueryTool(Tool):
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:
-            raise ValueError(f"Query execution failed. Make sure the query is in correct SQL format. Full trace: {e}")
+            raise ValueError(f"Query execution failed. Make sure the query is in correct SQL format, "
+                             f"and that all table/column references exist in the database by cross-referencing with the database schema. "
+                             f"Full trace: {e}")
 
 
 class GetSchemaTool(Tool):
