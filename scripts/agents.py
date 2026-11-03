@@ -23,6 +23,7 @@ def get_schema(db_path: str) -> str:
 class QueryTool(Tool):
     name = "query_db"
     description = ("Allows for queries to be tested on a database specified by db_id. "
+                   "If the query is valid, returns the input query and its result. "
                    "Use this to verify an SQL query works on the database.")
     inputs = {
         "query": {
@@ -34,7 +35,7 @@ class QueryTool(Tool):
             "description": "The ID of the database to be queried."
         }
     }
-    output_type = "array"
+    output_type = "object"
 
     def __init__(self, db_root: str):
         super().__init__()
@@ -42,7 +43,7 @@ class QueryTool(Tool):
         # Make a cache of connections for databases the tool has queried, for ease of access.
         self.connections = {}
 
-    def forward(self, query: str, db_id: str) -> list[str]:
+    def forward(self, query: str, db_id: str) -> dict:
         # Define a read-only connection to a database if none already exists.
         if db_id not in self.connections:
             try:
@@ -52,7 +53,8 @@ class QueryTool(Tool):
         cursor = self.connections[db_id].cursor()
         try:
             cursor.execute(query)
-            return cursor.fetchall()
+            results = cursor.fetchall()
+            return {"Query": query, "Results": results}
         except Exception as e:
             raise ValueError(f"Query execution failed. Make sure the query is in correct SQL format, "
                              f"and that all table/column references exist in the database by cross-referencing with the database schema. "
@@ -219,7 +221,7 @@ class AgentHarness:
                     update_plan_post_messages="",
                 ),
                 managed_agent=ManagedAgentPromptTemplate(task="", report=""),
-                final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages="Return ONLY the SQL query. Don't return the query's result."),
+                final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages=""),
             )
         )
 
