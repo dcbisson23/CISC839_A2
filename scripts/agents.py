@@ -34,7 +34,7 @@ class QueryTool(Tool):
             "description": "The ID of the database to be queried."
         }
     }
-    output_type = "array"
+    output_type = "boolean"
 
     def __init__(self, db_root: str):
         super().__init__()
@@ -42,7 +42,7 @@ class QueryTool(Tool):
         # Make a cache of connections for databases the tool has queried, for ease of access.
         self.connections = {}
 
-    def forward(self, query: str, db_id: str) -> list[str]:
+    def forward(self, query: str, db_id: str) -> bool:
         # Define a read-only connection to a database if none already exists.
         if db_id not in self.connections:
             try:
@@ -52,7 +52,7 @@ class QueryTool(Tool):
         cursor = self.connections[db_id].cursor()
         try:
             cursor.execute(query)
-            return cursor.fetchall()
+            return True
         except Exception as e:
             raise ValueError(f"Query execution failed. Make sure the query is in correct SQL format, "
                              f"and that all table/column references exist in the database by cross-referencing with the database schema. "
