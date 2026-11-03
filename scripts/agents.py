@@ -199,8 +199,7 @@ class AgentHarness:
             self,
             model_id: str,
             gen_config: dict,
-            tools: list[Tool],
-            sys_context: str
+            tools: list[Tool]
     ):
         self.engine = TransformersModel(
             model_id=model_id,
@@ -209,27 +208,16 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.prompt_template = PromptTemplates(
-            system_prompt=sys_context,
-            # Don't need to do anything else, but need these for the object to be complete.
-            planning=PlanningPromptTemplate(
-                initial_plan="",
-                update_plan_pre_messages="",
-                update_plan_post_messages="",
-            ),
-            managed_agent=ManagedAgentPromptTemplate(task="", report=""),
-            final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages=""),
-        )
         self.agent = ToolCallingAgent(
             tools=self.tools,
-            model=self.engine,
-            prompt_templates=self.prompt_template
+            model=self.engine
         )
 
     def run(self, question: str, db_id: str, return_full_result: bool = False) -> RunResult:
         result = self.agent.run(
-            task=question,
+            task="Produce a valid SQL query on the database specified db_id that answers the given natural language question.",
             additional_args={
+                "question": question,
                 "db_id": db_id
             },
             return_full_result=return_full_result
