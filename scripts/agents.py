@@ -210,8 +210,7 @@ class AgentHarness:
         self.tools = tools
         self.agent = ToolCallingAgent(
             tools=self.tools,
-            model=self.engine,
-            stream_outputs=
+            model=self.engine
         )
 
     def run(self,
