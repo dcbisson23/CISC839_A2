@@ -211,7 +211,16 @@ class AgentHarness:
         self.agent = ToolCallingAgent(
             tools=self.tools,
             model=self.engine,
-            planning_interval=3
+            prompt_templates=PromptTemplates(
+                system_prompt="",
+                planning=PlanningPromptTemplate(
+                    initial_plan="",
+                    update_plan_pre_messages="",
+                    update_plan_post_messages="",
+                ),
+                managed_agent=ManagedAgentPromptTemplate(task="", report=""),
+                final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages="Return ONLY the SQL query. Don't return the query's result."),
+            )
         )
 
     def run(self,
