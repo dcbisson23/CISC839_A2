@@ -217,7 +217,7 @@ def validate_final_answer(answer, memory, agent):
                          "If you attempted to submit the answer to an SQL query, submit the SQL query instead.")
 
 
-def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 3) -> None:
+def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6) -> None:
     previous_actions = [step for step in agent.memory.steps if isinstance(step, ActionStep)]
     for step in previous_actions[:-keep_last]:
         if step.observations:
@@ -244,7 +244,8 @@ class AgentHarness:
             model=self.engine,
             instructions=instructions,
             final_answer_checks=[validate_final_answer],
-            step_callbacks=[compact_old_observations]
+            step_callbacks=[compact_old_observations],
+            planning_interval=3
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
