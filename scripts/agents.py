@@ -246,7 +246,6 @@ class AgentHarness:
             final_answer_checks=[validate_final_answer],
             step_callbacks=[compact_old_observations]
         )
-        self.agent.prompt_templates["system_prompt"] = instructions
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
             # Original: "tried to answer a user query "
