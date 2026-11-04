@@ -23,7 +23,7 @@ def get_schema(db_path: str) -> str:
 class QueryTool(Tool):
     name = "query_db"
     description = ("Allows for queries to be tested on a database specified by db_id. "
-                   "If the query is valid, returns the input query and its result. "
+                   "If the query is valid, returns the result of the query. "
                    "Use this to verify an SQL query works on the database.")
     inputs = {
         "query": {
@@ -35,7 +35,7 @@ class QueryTool(Tool):
             "description": "The ID of the database to be queried."
         }
     }
-    output_type = "object"
+    output_type = "array"
 
     def __init__(self, db_root: str):
         super().__init__()
@@ -43,7 +43,7 @@ class QueryTool(Tool):
         # Make a cache of connections for databases the tool has queried, for ease of access.
         self.connections = {}
 
-    def forward(self, query: str, db_id: str) -> dict:
+    def forward(self, query: str, db_id: str) -> list:
         # Define a read-only connection to a database if none already exists.
         if db_id not in self.connections:
             try:
@@ -53,12 +53,12 @@ class QueryTool(Tool):
         cursor = self.connections[db_id].cursor()
         try:
             cursor.execute(query)
-            results = cursor.fetchall()
-            return {"Query": query, "Results": results}
+            return cursor.fetchall()
         except Exception as e:
             raise ValueError(f"Query execution failed. Make sure the query is in correct SQL format, "
                              f"and that all table/column references exist in the database by cross-referencing with the database schema. "
                              f"Full trace: {e}")
+
 
 class GetSchemaTool(Tool):
     name = "get_schema"
@@ -214,6 +214,22 @@ class AgentHarness:
             tools=self.tools,
             model=self.engine,
             instructions=instructions
+        )
+        self.agent.prompt_templates["final_answer"]["pre_messages"] = (
+            "An agent "
+            # Original: "tried to answer a user query "
+            "was given a task by a user "
+            "but it got stuck and failed to do so. You are tasked with "
+            # Original: "providing an answer "
+            "completing the task "
+            "instead. Here is the agent's memory:"
+        )
+        self.agent.prompt_templates["final_answer"]["post_messages"] = (
+            "Based on the above, please "
+            # Original: "provide an answer to "
+            "complete "
+            "the following user task:\n"
+            "{task}"
         )
 
     def run(self,
