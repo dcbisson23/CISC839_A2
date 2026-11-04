@@ -60,7 +60,6 @@ class QueryTool(Tool):
                              f"and that all table/column references exist in the database by cross-referencing with the database schema. "
                              f"Full trace: {e}")
 
-
 class GetSchemaTool(Tool):
     name = "get_schema"
     description = "Returns the full SQL schema of a database specified by db_id."
@@ -201,6 +200,7 @@ class AgentHarness:
             self,
             model_id: str,
             gen_config: dict,
+            instructions: str,
             tools: list[Tool]
     ):
         self.engine = TransformersModel(
@@ -213,16 +213,7 @@ class AgentHarness:
         self.agent = ToolCallingAgent(
             tools=self.tools,
             model=self.engine,
-            prompt_templates=PromptTemplates(
-                system_prompt="",
-                planning=PlanningPromptTemplate(
-                    initial_plan="",
-                    update_plan_pre_messages="",
-                    update_plan_post_messages="",
-                ),
-                managed_agent=ManagedAgentPromptTemplate(task="", report=""),
-                final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages=""),
-            )
+            instructions=instructions
         )
 
     def run(self,
