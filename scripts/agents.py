@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-from smolagents import TransformersModel, ToolCallingAgent, Tool, tool, RunResult, PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
+from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
 import json
 import sqlite3
 import numpy as np
@@ -210,7 +210,7 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = ToolCallingAgent(
+        self.agent = CodeAgent(
             tools=self.tools,
             model=self.engine,
             instructions=instructions
@@ -248,6 +248,3 @@ class AgentHarness:
             return_full_result=return_full_result
         )
         return result
-
-
-
