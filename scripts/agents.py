@@ -240,8 +240,7 @@ class AgentHarness:
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
-            final_answer_checks=[validate_final_answer],
-            planning_interval=2
+            final_answer_checks=[validate_final_answer]
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
