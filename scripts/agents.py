@@ -87,10 +87,11 @@ class GetSchemaTool(Tool):
 
 
 class TableOrdererTool(Tool):
-    name = "order_tables"
-    description = ("Given a database ID, a threshold value and a natural-language question, "
-                   "returns the table schemas in order of most to least relevant to the question."
-                   "Prioritize using the most relevant tables when generating the SQL query to answer the question.")
+    name = "get_relevant_tables"
+    description = ("Given a database ID and a natural-language question, and a k value, "
+                   "returns the table schemas in order of most to least relevant to the question.\n"
+                   "Run this instead of pulling the full database schema where possible, "
+                   "to prioritize analyzing the most important tables.")
     inputs = {
         "db_id": {
             "type": "string",
@@ -99,7 +100,11 @@ class TableOrdererTool(Tool):
         "question": {
             "type": "string",
             "description": "The natural language question for the database."
-        }
+        },
+        "k": {
+            "type": "integer",
+            "description": "Specifies how many of the top k tables to return. Start with 1 if possible."
+         }
     }
     output_type = "array"
 
@@ -118,9 +123,10 @@ class TableOrdererTool(Tool):
         embeddings = []
         for idx, statement in enumerate(statements):
             if statement.startswith("CREATE TABLE"):
-                table_name = statement.split('"')[1]
-                table_embedding = self.encoder.encode(statement)
-                tables.append({"table_name": table_name, "schema": statement})
+                fixed_statement = statement.replace("\\n", "\n")
+                table_name = fixed_statement.split('"')[1]
+                table_embedding = self.encoder.encode(fixed_statement)
+                tables.append({"table_name": table_name, "schema": fixed_statement})
                 embeddings.append(table_embedding)
         self.dbs[db_id] = {"tables": tables, "embeddings": embeddings}
 
@@ -129,7 +135,7 @@ class TableOrdererTool(Tool):
             self._setup_db_info(db_id)
         return self.dbs[db_id]
 
-    def forward(self, db_id: str, question: str) -> list[str]:
+    def forward(self, db_id: str, question: str, k: int) -> list[str]:
         question_embedding = np.array(self.encoder.encode(question)).reshape(1, -1)
         db_info = self._get_db_info(db_id)
         tables = db_info["tables"]
@@ -137,8 +143,12 @@ class TableOrdererTool(Tool):
         similarities = cosine_similarity(question_embedding, table_embeddings)
         sorted_indices = np.argsort(similarities)[::-1]
         sorted_tables = []
+        table_counter = 0
         for idx in sorted_indices[0]:
             sorted_tables.append(tables[idx]["schema"])
+            table_counter += 1
+            if table_counter >= k:
+                break
 
         return sorted_tables
 
@@ -230,7 +240,8 @@ class AgentHarness:
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
-            final_answer_checks=[validate_final_answer]
+            final_answer_checks=[validate_final_answer],
+            planning_interval=2
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
