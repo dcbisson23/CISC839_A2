@@ -224,7 +224,7 @@ def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6)
             step.observations = "[Earlier observation omitted to limit context growth.]"
 
 
-class ModifiedToolCallingAgent(ToolCallingAgent):
+class ModifiedAgent(CodeAgent):
     def write_memory_to_messages(
         self,
         summary_mode: bool = True,
@@ -252,7 +252,7 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = ModifiedToolCallingAgent(
+        self.agent = ModifiedAgent(
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
