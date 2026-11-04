@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep
+from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage
 import json
 import sqlite3
 import numpy as np
@@ -224,6 +224,19 @@ def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6)
             step.observations = "[Earlier observation omitted to limit context growth.]"
 
 
+class ModifiedToolCallingAgent(ToolCallingAgent):
+    def write_memory_to_messages(
+        self,
+        summary_mode: bool = True,
+    ) -> list[ChatMessage]:
+        # This is identical to the class method for ToolCallingAgent, but with the default summary_mode set to True rather than False.
+        # The hope is this will reduce context length by summarizing at each step.
+        messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
+        for memory_step in self.memory.steps:
+            messages.extend(memory_step.to_messages(summary_mode=summary_mode))
+        return messages
+
+
 class AgentHarness:
     def __init__(
             self,
@@ -239,12 +252,11 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = ToolCallingAgent(
+        self.agent = ModifiedToolCallingAgent(
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
-            final_answer_checks=[validate_final_answer],
-            step_callbacks=[compact_old_observations]
+            final_answer_checks=[validate_final_answer]
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
