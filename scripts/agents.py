@@ -155,11 +155,8 @@ class TableOrdererTool(Tool):
 class ExampleRetrieverTool(Tool):
     name = "example_retriever"
     description = ("For a given natural-language question to be converted to an SQL query, "
-                   "finds 3 examples of similar questions and SQL queries that answer them. "
-                   "For each example, returns the example question, "
-                   "an SQL query that answers the question, "
-                   "and the similarity score that measures how similar the example question is to the original question (1 is best), "
-                   "in that order."
+                   "returns 3 examples of similar questions and SQL queries that answer them. "
+                   "Also scores each example by how similar they are to the original (1 is best)."
                    "Use this tool to get good examples of how similar questions are converted into SQL queries, "
                    "to help inform generation of an SQL query for the provided question.")
     inputs = {
