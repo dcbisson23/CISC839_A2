@@ -1,11 +1,12 @@
 from sentence_transformers import SentenceTransformer
-from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
+from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, AgentError
 import json
 import sqlite3
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import sqlparse
+import sqlvalidator
 
 
 @tool
@@ -195,6 +196,17 @@ class ExampleRetrieverTool(Tool):
         return top_examples
 
 
+def validate_final_answer(answer, memory, agent):
+    # Note we need to give the memory and agent fields or this won't work.
+    sql_query = sqlvalidator.parse(answer)
+    if not sql_query.is_valid():
+        raise ValueError(
+            "Final answer is not a valid SQL query. "
+            "If you attempted to submit the answer to an SQL query, submit the SQL query itself instead."
+        )
+    return True
+
+
 class AgentHarness:
     def __init__(
             self,
@@ -210,10 +222,11 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = CodeAgent(
+        self.agent = ToolCallingAgent(
             tools=self.tools,
             model=self.engine,
-            instructions=instructions
+            instructions=instructions,
+            final_answer_checks=[validate_final_answer]
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
@@ -236,11 +249,13 @@ class AgentHarness:
             question: str,
             db_id: str,
             task: str,
+            max_steps: int,
             stream_outputs: bool = False,
             return_full_result: bool = False) -> RunResult:
         result = self.agent.run(
             task=task,
             stream=stream_outputs,
+            max_steps=max_steps,
             additional_args={
                 "question": question,
                 "db_id": db_id
