@@ -1,5 +1,5 @@
 from sentence_transformers import SentenceTransformer
-from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, AgentError
+from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep
 import json
 import sqlite3
 import numpy as np
@@ -123,10 +123,9 @@ class TableOrdererTool(Tool):
         embeddings = []
         for idx, statement in enumerate(statements):
             if statement.startswith("CREATE TABLE"):
-                fixed_statement = statement.replace("\\n", "\n")
-                table_name = fixed_statement.split('"')[1]
-                table_embedding = self.encoder.encode(fixed_statement)
-                tables.append({"table_name": table_name, "schema": fixed_statement})
+                table_name = statement.split('"')[1]
+                table_embedding = self.encoder.encode(statement)
+                tables.append({"table_name": table_name, "schema": statement})
                 embeddings.append(table_embedding)
         self.dbs[db_id] = {"tables": tables, "embeddings": embeddings}
 
@@ -221,6 +220,13 @@ def validate_final_answer(answer, memory, agent):
                          "If you attempted to submit the answer to an SQL query, submit the SQL query instead.")
 
 
+def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 3) -> None:
+    previous_actions = [step for step in agent.memory.steps if isinstance(step, ActionStep)]
+    for step in previous_actions[:-keep_last]:
+        if step.observations:
+            step.observations = "[Earlier observation omitted to limit context growth.]"
+
+
 class AgentHarness:
     def __init__(
             self,
@@ -240,7 +246,8 @@ class AgentHarness:
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
-            final_answer_checks=[validate_final_answer]
+            final_answer_checks=[validate_final_answer],
+            step_callbacks=[compact_old_observations]
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
