@@ -140,10 +140,10 @@ class TableOrdererTool(Tool):
         tables = db_info["tables"]
         table_embeddings = np.array(db_info["embeddings"])
         similarities = cosine_similarity(question_embedding, table_embeddings)
-        sorted_indices = np.argsort(similarities)[::-1]
+        sorted_indices = np.argsort(similarities)[0][::-1]
         sorted_tables = []
         table_counter = 0
-        for idx in sorted_indices[0]:
+        for idx in sorted_indices:
             sorted_tables.append(tables[idx]["schema"])
             table_counter += 1
             if table_counter >= k:
@@ -244,8 +244,7 @@ class AgentHarness:
             model=self.engine,
             instructions=instructions,
             final_answer_checks=[validate_final_answer],
-            step_callbacks=[compact_old_observations],
-            planning_interval=3
+            step_callbacks=[compact_old_observations]
         )
         self.agent.prompt_templates["final_answer"]["pre_messages"] = (
             "An agent "
