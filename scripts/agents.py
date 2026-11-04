@@ -222,7 +222,7 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = ToolCallingAgent(
+        self.agent = CodeAgent(
             tools=self.tools,
             model=self.engine,
             instructions=instructions,
