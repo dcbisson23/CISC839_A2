@@ -198,13 +198,17 @@ class ExampleRetrieverTool(Tool):
 
 def validate_final_answer(answer, memory, agent):
     # Note we need to give the memory and agent fields or this won't work.
-    sql_query = sqlvalidator.parse(answer)
-    if not sql_query.is_valid():
-        raise ValueError(
-            "Final answer is not a valid SQL query. "
-            "If you attempted to submit the answer to an SQL query, submit the SQL query itself instead."
-        )
-    return True
+    try:
+        sql_query = sqlvalidator.parse(answer)
+        if not sql_query.is_valid():
+            raise ValueError(
+                "Final answer is not a valid SQL query. "
+                "If you attempted to submit the answer to an SQL query, submit the SQL query itself instead."
+            )
+        return True
+    except Exception as e:
+        raise ValueError("Final answer is not a valid SQL query. "
+                         "If you attempted to submit the answer to an SQL query, submit the SQL query instead.")
 
 
 class AgentHarness:
