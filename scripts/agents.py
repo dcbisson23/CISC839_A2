@@ -202,41 +202,6 @@ class ExampleRetrieverTool(Tool):
         return top_examples
 
 
-def validate_final_answer(answer, memory, agent):
-    # Note we need to give the memory and agent fields or this won't work.
-    try:
-        sql_query = sqlvalidator.parse(answer)
-        if not sql_query.is_valid():
-            raise ValueError(
-                "Final answer is not a valid SQL query. "
-                "If you attempted to submit the answer to an SQL query, submit the SQL query itself instead."
-            )
-        return True
-    except Exception as e:
-        raise ValueError("Final answer is not a valid SQL query. "
-                         "If you attempted to submit the answer to an SQL query, submit the SQL query instead.")
-
-
-def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6) -> None:
-    previous_actions = [step for step in agent.memory.steps if isinstance(step, ActionStep)]
-    for step in previous_actions[:-keep_last]:
-        if step.observations:
-            step.observations = "[Earlier observation omitted to limit context growth.]"
-
-
-class ModifiedAgent(ToolCallingAgent):
-    def write_memory_to_messages(
-        self,
-        summary_mode: bool = False,
-    ) -> list[ChatMessage]:
-        # This is identical to the class method for ToolCallingAgent, but with the default summary_mode set to True rather than False.
-        # The hope is this will reduce context length by summarizing at each step.
-        messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
-        for memory_step in self.memory.steps:
-            messages.extend(memory_step.to_messages(summary_mode=summary_mode))
-        return messages
-
-
 class AgentHarness:
     def __init__(
             self,
@@ -252,11 +217,10 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = ModifiedAgent(
+        self.agent = ToolCallingAgent(
             tools=self.tools,
             model=self.engine,
-            instructions=instructions,
-            final_answer_checks=[validate_final_answer]
+            instructions=instructions
         )
 
     def run(self,
