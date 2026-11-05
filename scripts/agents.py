@@ -86,11 +86,7 @@ class GetSchemaTool(Tool):
             with open(f"{self.db_root}/{db_id}/schema.sql", "r") as f:
                 db_schema = f.read()
             statements = sqlparse.split(db_schema)
-            tables = []
-            for statement in statements:
-                if statement.startswith("CREATE TABLE"):
-                    tables.append(statement)
-            self.schemas = {db_id: "\n\n".join(tables)}
+            self.schemas = {db_id: "\n".join(statements)}
 
         schema = self.schemas[db_id]
         return schema
