@@ -227,7 +227,7 @@ def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6)
 class ModifiedAgent(CodeAgent):
     def write_memory_to_messages(
         self,
-        summary_mode: bool = True,
+        summary_mode: bool = False,
     ) -> list[ChatMessage]:
         # This is identical to the class method for ToolCallingAgent, but with the default summary_mode set to True rather than False.
         # The hope is this will reduce context length by summarizing at each step.
