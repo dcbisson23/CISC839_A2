@@ -234,6 +234,7 @@ class ModifiedAgent(ToolCallingAgent):
         messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
         for memory_step in self.memory.steps:
             messages.extend(memory_step.to_messages(summary_mode=summary_mode))
+        print(messages)
         return messages
 
 
