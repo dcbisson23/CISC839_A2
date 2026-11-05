@@ -224,7 +224,7 @@ def compact_old_observations(memory_step: ActionStep, agent, keep_last: int = 6)
             step.observations = "[Earlier observation omitted to limit context growth.]"
 
 
-class ModifiedAgent(CodeAgent):
+class ModifiedAgent(ToolCallingAgent):
     def write_memory_to_messages(
         self,
         summary_mode: bool = True,
@@ -258,33 +258,15 @@ class AgentHarness:
             instructions=instructions,
             final_answer_checks=[validate_final_answer]
         )
-        self.agent.prompt_templates["final_answer"]["pre_messages"] = (
-            "An agent "
-            # Original: "tried to answer a user query "
-            "was given a task by a user "
-            "but it got stuck and failed to do so. You are tasked with "
-            # Original: "providing an answer "
-            "completing the task "
-            "instead. Here is the agent's memory:"
-        )
-        self.agent.prompt_templates["final_answer"]["post_messages"] = (
-            "Based on the above, please "
-            # Original: "provide an answer to "
-            "complete "
-            "the following user task:\n"
-            "{task}"
-        )
 
     def run(self,
             question: str,
             db_id: str,
             task: str,
             max_steps: int,
-            stream_outputs: bool = False,
             return_full_result: bool = False) -> RunResult:
         result = self.agent.run(
             task=task,
-            stream=stream_outputs,
             max_steps=max_steps,
             additional_args={
                 "question": question,
