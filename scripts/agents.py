@@ -208,6 +208,11 @@ class ExampleRetrieverTool(Tool):
         return top_examples
 
 
+def validate_final_answer(final_answer, memory, agent):
+    answer_sql = sqlvalidator.parse(final_answer)
+    return answer_sql.is_valid()
+
+
 class CustomAgent(ToolCallingAgent):
     def write_memory_to_messages(
         self,
@@ -241,6 +246,7 @@ class AgentHarness:
         self.agent = CustomAgent(
             tools=self.tools,
             model=self.engine,
+            final_answer_checks=[validate_final_answer],
             prompt_templates=PromptTemplates(
                 system_prompt=sys_prompt,
                 planning=PlanningPromptTemplate(
