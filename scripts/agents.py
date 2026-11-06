@@ -213,7 +213,7 @@ def validate_final_answer(final_answer, memory, agent):
     if answer_sql.is_valid():
         return True
     else:
-        raise ValueError("Final answer must be a valid SQL query.")
+        raise ValueError("\"answer\" string in JSON blob must be a valid SQL query.")
 
 
 class CustomAgent(ToolCallingAgent):
