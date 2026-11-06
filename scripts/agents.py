@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
-from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage
+from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage, \
+    PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
 import json
 import sqlite3
 import numpy as np
@@ -8,18 +9,6 @@ from sentence_transformers import SentenceTransformer
 import sqlparse
 import sqlvalidator
 from torch import Tensor
-
-
-@tool
-def get_schema(db_path: str) -> str:
-    """
-    Pulls a database schema from the schema file.
-    Args:
-         db_path: The path to the SQL schema file.
-    """
-    with open(db_path, "r") as f:
-        schema = f.read()
-    return schema
 
 
 class QueryTool(Tool):
@@ -219,14 +208,29 @@ class ExampleRetrieverTool(Tool):
         return top_examples
 
 
+class CustomAgent(ToolCallingAgent):
+    def write_memory_to_messages(
+        self,
+        summary_mode: bool = False,
+    ) -> list[ChatMessage]:
+        # Modified to reduce memory usage.
+        # Keeps system prompt, removes agent thoughts in each step but retains action/observation.
+
+        messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
+        for memory_step in self.memory.steps:
+            messages.extend(memory_step.to_messages(summary_mode=True))
+        return messages
+
+
 class AgentHarness:
     def __init__(
             self,
             model_id: str,
             gen_config: dict,
-            instructions: str,
-            tools: list[Tool]
+            tools: list[Tool],
+            sys_prompt: str
     ):
+
         self.engine = TransformersModel(
             model_id=model_id,
             device_map="balanced",
@@ -234,10 +238,19 @@ class AgentHarness:
             **gen_config
         )
         self.tools = tools
-        self.agent = CodeAgent(
+        self.agent = CustomAgent(
             tools=self.tools,
             model=self.engine,
-            instructions=instructions
+            prompt_templates=PromptTemplates(
+                system_prompt=sys_prompt,
+                planning=PlanningPromptTemplate(
+                    initial_plan="",
+                    update_plan_pre_messages="",
+                    update_plan_post_messages="",
+                ),
+                managed_agent=ManagedAgentPromptTemplate(task="", report=""),
+                final_answer=FinalAnswerPromptTemplate(pre_messages="", post_messages=""),
+            )
         )
 
     def run(self,
