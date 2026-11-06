@@ -210,7 +210,10 @@ class ExampleRetrieverTool(Tool):
 
 def validate_final_answer(final_answer, memory, agent):
     answer_sql = sqlvalidator.parse(final_answer)
-    return answer_sql.is_valid()
+    if answer_sql.is_valid():
+        return True
+    else:
+        raise ValueError("Final answer must be a valid SQL query.")
 
 
 class CustomAgent(ToolCallingAgent):
