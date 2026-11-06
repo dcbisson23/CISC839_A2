@@ -237,8 +237,7 @@ class AgentHarness:
         self.agent = CodeAgent(
             tools=self.tools,
             model=self.engine,
-            instructions=instructions,
-            use_structured_outputs_internally=True
+            instructions=instructions
         )
 
     def run(self,
