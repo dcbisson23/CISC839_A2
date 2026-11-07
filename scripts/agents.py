@@ -249,6 +249,8 @@ class CustomAgent(ToolCallingAgent):
             try:
                 for item in step_stream:
                     step_list.append(item)
+                for item in step_list:
+                    yield item
             except Exception as e:
                 if isinstance(e, AgentParsingError):
                     if self.logger is not None:
