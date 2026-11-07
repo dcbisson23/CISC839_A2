@@ -284,11 +284,11 @@ class CustomModel(TransformersModel):
             **kwargs,
         )
         count_prompt_tokens = generation_kwargs["inputs"].shape[1]  # type: ignore
-        print(generation_kwargs)
         out = self.model.generate(
             **generation_kwargs,
         )
-        generated_tokens = out[0, count_prompt_tokens:]
+        # generated_tokens = out[0, count_prompt_tokens:]
+        generated_tokens = out[:]
         if hasattr(self, "processor"):
             output_text = self.processor.decode(generated_tokens, skip_special_tokens=True)
         else:
