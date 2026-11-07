@@ -1,6 +1,7 @@
 from sentence_transformers import SentenceTransformer
 from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage, \
     PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
+from smolagents.utils import Retrying, AgentParsingError
 import json
 import sqlite3
 import numpy as np
@@ -216,8 +217,13 @@ def validate_final_answer(final_answer, memory, agent):
     else:
         raise ValueError("\"answer\" string in JSON blob must be a valid SQL query.")
 
+def is_agent_parsing_error(exception: BaseException) -> bool:
+    return isinstance(exception, AgentParsingError)
+
 
 class CustomAgent(ToolCallingAgent):
+    retryer = Retrying(max_attempts=5, exponential_base=1, jitter=False, retry_predicate=is_agent_parsing_error)
+
     def write_memory_to_messages(
         self,
         summary_mode: bool = False,
@@ -229,6 +235,10 @@ class CustomAgent(ToolCallingAgent):
         for memory_step in self.memory.steps:
             messages.extend(memory_step.to_messages(summary_mode=True))
         return messages
+
+    def _step_stream(self, memory_step: ActionStep):
+        return self.retryer(super()._step_stream(memory_step))
+
 
 
 class AgentHarness:
