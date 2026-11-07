@@ -295,6 +295,7 @@ class CustomModel(TransformersModel):
         print(output_text)
         if stop_sequences is not None:
             output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
+        print(output_text)
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
