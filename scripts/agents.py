@@ -287,13 +287,12 @@ class CustomModel(TransformersModel):
         out = self.model.generate(
             **generation_kwargs,
         )
-        # generated_tokens = out[0, count_prompt_tokens:]
-        generated_tokens = out[0, :]
+        generated_tokens = out[0, count_prompt_tokens:]
         if hasattr(self, "processor"):
             output_text = self.processor.decode(generated_tokens, skip_special_tokens=True)
         else:
             output_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
-
+        print(output_text)
         if stop_sequences is not None:
             output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
         return ChatMessage(
