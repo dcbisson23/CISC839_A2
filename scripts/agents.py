@@ -243,19 +243,20 @@ class CustomAgent(ToolCallingAgent):
         # Basically wrapped _step_stream to allow for retrying if the model fails to produce a tool call.
         if self.max_retries <= 0:
             yield from super()._step_stream(memory_step)
-        for i in range(0, self.max_retries):
-            step_stream = super()._step_stream(memory_step)
-            step_list = []
-            try:
-                for item in step_stream:
-                    step_list.append(item)
-                for item in step_list:
-                    yield item
-                break
-            except Exception as e:
-                if isinstance(e, AgentParsingError):
-                    if self.logger is not None:
-                        self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
+        else:
+            for i in range(0, self.max_retries+2):
+                step_stream = super()._step_stream(memory_step)
+                step_list = []
+                try:
+                    for item in step_stream:
+                        step_list.append(item)
+                    for item in step_list:
+                        yield item
+                    break
+                except Exception as e:
+                    if isinstance(e, AgentParsingError):
+                        if self.logger is not None and i < self.max_retries:
+                            self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
                     else:
                         for item in step_list:
                             yield item
