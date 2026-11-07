@@ -236,8 +236,8 @@ class CustomAgent(ToolCallingAgent):
             messages.extend(memory_step.to_messages(summary_mode=True))
         return messages
 
-    def _step_stream(self, memory_step: ActionStep):
-        return self.retryer(super()._step_stream(memory_step))
+    def _step_stream(self, *args, **kwargs):
+        return self.retryer(super()._step_stream, *args, **kwargs)
 
 
 
