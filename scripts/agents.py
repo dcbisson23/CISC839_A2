@@ -223,7 +223,7 @@ def is_agent_parsing_error(exception: BaseException) -> bool:
 
 
 class CustomAgent(ToolCallingAgent):
-    def __init__(self, max_retries: int=2, *args, **kwargs):
+    def __init__(self, max_retries: int = 3, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.max_retries=max_retries
 
@@ -243,7 +243,7 @@ class CustomAgent(ToolCallingAgent):
         # Basically wrapped _step_stream to allow for retrying if the model fails to produce a tool call.
         if self.max_retries <= 0:
             yield from super()._step_stream(memory_step)
-        for i in range(1, self.max_retries+1):
+        for i in range(0, self.max_retries):
             step_stream = super()._step_stream(memory_step)
             step_list = []
             try:
@@ -252,7 +252,7 @@ class CustomAgent(ToolCallingAgent):
             except Exception as e:
                 if isinstance(e, AgentParsingError):
                     if self.logger is not None:
-                        self.logger.log(f"Regenerating (attempt {i} of {self.max_retries})...")
+                        self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
                     else:
                         for item in step_list:
                             yield item
