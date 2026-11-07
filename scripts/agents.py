@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage, \
     PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate, MessageRole, \
     TokenUsage
+from smolagents.models import remove_content_after_stop_sequences
 from smolagents.utils import Retrying, AgentParsingError
 import json
 import sqlite3
@@ -266,21 +267,47 @@ class CustomAgent(ToolCallingAgent):
 
 class CustomModel(TransformersModel):
     # Straight from TransformersModel class, but removed stop sequences.
-    def remove_content_after_stop_sequences(content: str | None, stop_sequences: list[str] | None) -> str | None:
-        """Remove content after any stop sequence is encountered.
+    def generate(
+        self,
+        messages: list[ChatMessage | dict],
+        stop_sequences: list[str] | None = None,
+        response_format: dict[str, str] | None = None,
+        tools_to_call_from: list[Tool] | None = None,
+        **kwargs,
+    ) -> ChatMessage:
+        if response_format is not None:
+            raise ValueError("Transformers does not support structured outputs, use VLLMModel for this.")
+        generation_kwargs = self._prepare_completion_args(
+            messages=messages,
+            stop_sequences=stop_sequences,
+            tools_to_call_from=tools_to_call_from,
+            **kwargs,
+        )
+        count_prompt_tokens = generation_kwargs["inputs"].shape[1]  # type: ignore
+        out = self.model.generate(
+            **generation_kwargs,
+        )
+        generated_tokens = out[0, count_prompt_tokens:]
+        print(generated_tokens)
+        if hasattr(self, "processor"):
+            output_text = self.processor.decode(generated_tokens, skip_special_tokens=True)
+        else:
+            output_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
 
-        Some providers may return ``None`` content (for example when responding purely with tool calls),
-        so we skip processing in that case.
-        """
-        if content is None or not stop_sequences:
-            return content
-
-        for stop_seq in stop_sequences:
-            pass
-            # Original:
-            # split = content.split(stop_seq)
-            # content = split[0]
-        return content
+        if stop_sequences is not None:
+            output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
+        return ChatMessage(
+            role=MessageRole.ASSISTANT,
+            content=output_text,
+            raw={
+                "out": output_text,
+                "completion_kwargs": {key: value for key, value in generation_kwargs.items() if key != "inputs"},
+            },
+            token_usage=TokenUsage(
+                input_tokens=count_prompt_tokens,
+                output_tokens=len(generated_tokens),
+            ),
+        )
 
 
 
