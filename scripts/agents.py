@@ -14,7 +14,7 @@ from torch import Tensor
 class QueryTool(Tool):
     name = "query_db"
     description = ("Attempts to run an SQL query on the specified database.\n"
-                   "Returns the result of the query as a string.")
+                   "Returns the query and the value(s) the query returns when executed.")
     inputs = {
         "query": {
             "type": "string",
@@ -45,7 +45,8 @@ class QueryTool(Tool):
         cursor = self.connections[db_id].cursor()
         try:
             cursor.execute(query)
-            return "\n".join([str(item) for item in cursor.fetchall()])
+            output = f"Query:\n\t{query}\n"
+            return output+"Value(s):\n\t"+"\n\t".join([str(item) for item in cursor.fetchall()])
         except Exception as e:
             raise ValueError(f"Query execution failed.\n"
                              f"Make sure the query is in correct SQL format.\n"
