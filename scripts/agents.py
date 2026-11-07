@@ -254,8 +254,8 @@ class CustomAgent(ToolCallingAgent):
                         yield item
                     break
                 except Exception as e:
-                    if isinstance(e, AgentParsingError):
-                        if self.logger is not None and i < self.max_retries:
+                    if isinstance(e, AgentParsingError) and i < self.max_retries:
+                        if self.logger is not None:
                             self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
                     else:
                         for item in step_list:
