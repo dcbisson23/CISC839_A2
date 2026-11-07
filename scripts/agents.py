@@ -217,6 +217,7 @@ def validate_final_answer(final_answer, memory, agent):
     else:
         raise ValueError("\"answer\" string in JSON blob must be a valid SQL query.")
 
+
 def is_agent_parsing_error(exception: BaseException) -> bool:
     return isinstance(exception, AgentParsingError)
 
@@ -247,7 +248,8 @@ class AgentHarness:
             model_id: str,
             gen_config: dict,
             tools: list[Tool],
-            sys_prompt: str
+            sys_prompt: str,
+            verbosity: int = 1
     ):
 
         self.engine = TransformersModel(
@@ -260,6 +262,7 @@ class AgentHarness:
         self.agent = CustomAgent(
             tools=self.tools,
             model=self.engine,
+            verbosity_level=verbosity,
             final_answer_checks=[validate_final_answer],
             prompt_templates=PromptTemplates(
                 system_prompt=sys_prompt,
