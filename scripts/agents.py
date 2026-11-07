@@ -1,6 +1,7 @@
 from sentence_transformers import SentenceTransformer
 from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage, \
-    PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate
+    PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate, MessageRole, \
+    TokenUsage
 from smolagents.utils import Retrying, AgentParsingError
 import json
 import sqlite3
@@ -263,7 +264,23 @@ class CustomAgent(ToolCallingAgent):
                         raise
 
 
+class CustomModel(TransformersModel):
+    # Straight from TransformersModel class, but removed stop sequences.
+    def remove_content_after_stop_sequences(content: str | None, stop_sequences: list[str] | None) -> str | None:
+        """Remove content after any stop sequence is encountered.
 
+        Some providers may return ``None`` content (for example when responding purely with tool calls),
+        so we skip processing in that case.
+        """
+        if content is None or not stop_sequences:
+            return content
+
+        for stop_seq in stop_sequences:
+            pass
+            # Original:
+            # split = content.split(stop_seq)
+            # content = split[0]
+        return content
 
 
 
@@ -277,7 +294,7 @@ class AgentHarness:
             verbosity: int = 1
     ):
 
-        self.engine = TransformersModel(
+        self.engine = CustomModel(
             model_id=model_id,
             device_map="balanced",
             trust_remote_code=False,
