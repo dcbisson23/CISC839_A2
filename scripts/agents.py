@@ -251,6 +251,7 @@ class CustomAgent(ToolCallingAgent):
                     step_list.append(item)
                 for item in step_list:
                     yield item
+                break
             except Exception as e:
                 if isinstance(e, AgentParsingError):
                     if self.logger is not None:
