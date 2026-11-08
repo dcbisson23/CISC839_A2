@@ -1,3 +1,4 @@
+import re
 import uuid
 
 from sentence_transformers import SentenceTransformer
@@ -6,7 +7,7 @@ from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, too
     TokenUsage
 from smolagents.models import remove_content_after_stop_sequences, ChatMessageToolCall, parse_json_if_needed, \
     ChatMessageToolCallFunction
-from smolagents.utils import Retrying, AgentParsingError, parse_json_blob
+from smolagents.utils import Retrying, AgentParsingError
 import json
 import sqlite3
 import numpy as np
@@ -223,10 +224,6 @@ def validate_final_answer(final_answer, memory, agent):
         raise ValueError("\"answer\" string in JSON blob must be a valid SQL query.")
 
 
-def is_agent_parsing_error(exception: BaseException) -> bool:
-    return isinstance(exception, AgentParsingError)
-
-
 class CustomAgent(ToolCallingAgent):
     def __init__(self, max_retries: int = 3, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -268,6 +265,30 @@ class CustomAgent(ToolCallingAgent):
                         raise
 
 
+# Had to change the type hint and that's it.
+def parse_json_blob(json_blob: str) -> tuple[dict[str, str|dict], str]:
+    "Extracts the JSON blob from the input and returns the JSON data and the rest of the input."
+    try:
+        first_accolade_index = json_blob.find("{")
+        last_accolade_index = [a.start() for a in list(re.finditer("}", json_blob))][-1]
+        json_str = json_blob[first_accolade_index : last_accolade_index + 1]
+        json_data = json.loads(json_str, strict=False)
+        return json_data, json_blob[:first_accolade_index]
+    except IndexError:
+        raise ValueError("The model output does not contain any JSON blob.")
+    except json.JSONDecodeError as e:
+        place = e.pos
+        if json_blob[place - 1 : place + 2] == "},\n":
+            raise ValueError(
+                "JSON is invalid: you probably tried to provide multiple tool calls in one action. PROVIDE ONLY ONE TOOL CALL."
+            )
+        raise ValueError(
+            f"The JSON blob you used is invalid due to the following error: {e}.\n"
+            f"JSON blob was: {json_blob}, decoding failed on that specific part of the blob:\n"
+            f"'{json_blob[place - 4 : place + 5]}'."
+        )
+
+
 def get_tool_call_from_text(text: str, tool_name_key: str, tool_arguments_key: str) -> ChatMessageToolCall:
     tool_call_dictionary, _ = parse_json_blob(text)
     alt_keys = ["id", "type", "function"]
@@ -279,7 +300,7 @@ def get_tool_call_from_text(text: str, tool_name_key: str, tool_arguments_key: s
     if not not_alt_keys:
         tool_id = tool_call_dictionary["id"]
         tool_type = tool_call_dictionary["type"]
-        tool_func = json.loads(tool_call_dictionary["function"])
+        tool_func = tool_call_dictionary["function"]
         return ChatMessageToolCall(
             id=tool_id,
             type=tool_type,
