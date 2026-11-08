@@ -265,8 +265,6 @@ class CustomAgent(ToolCallingAgent):
                         raise
 
 
-
-
 class CustomModel(TransformersModel):
     # Straight from TransformersModel class, but removed stop sequences.
     def generate(
@@ -297,6 +295,7 @@ class CustomModel(TransformersModel):
         if stop_sequences is not None:
             # output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
             pass
+        output_text.replace("'", '"')
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
