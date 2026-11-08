@@ -15,6 +15,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 import sqlparse
 import sqlvalidator
+import torch
+import gc
 from torch import Tensor
 
 
@@ -365,6 +367,10 @@ class CustomModel(TransformersModel):
             # output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
             pass
         output_text = output_text.replace("'", '"')
+        del generation_kwargs["inputs"]
+        del out
+        gc.collect()
+        torch.cuda.empty_cache()
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
