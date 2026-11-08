@@ -257,18 +257,26 @@ class CustomAgent(ToolCallingAgent):
                     for item in step_stream:
                         step_list.append(item)
                         del item
+                    del step_stream
                     for item in step_list:
                         yield item
                         del item
+                    del step_list
+                    gc.collect()
+                    torch.cuda.empty_cache()
                     break
                 except Exception as e:
                     if isinstance(e, AgentParsingError) and i < self.max_retries:
                         if self.logger is not None:
                             self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
                     else:
+                        del step_stream
                         for item in step_list:
                             yield item
                             del item
+                        del step_list
+                        gc.collect()
+                        torch.cuda.empty_cache()
                         raise
                 del step_stream
                 del step_list
@@ -378,6 +386,7 @@ class CustomModel(TransformersModel):
             pass
         del generation_kwargs["inputs"]
         del out
+        gc.collect()
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
