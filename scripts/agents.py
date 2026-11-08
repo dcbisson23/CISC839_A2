@@ -270,6 +270,8 @@ class CustomAgent(ToolCallingAgent):
                         raise
                 del step_stream
                 del step_list
+                gc.collect()
+                torch.cuda.empty_cache()
 
 
 # Had to change the type hint and that's it.
