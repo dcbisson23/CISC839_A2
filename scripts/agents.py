@@ -232,17 +232,17 @@ class CustomAgent(ToolCallingAgent):
         super().__init__(*args, **kwargs)
         self.max_retries=max_retries
 
-    def write_memory_to_messages(
-        self,
-        summary_mode: bool = False,
-    ) -> list[ChatMessage]:
-        # Modified to reduce memory usage.
-        # Keeps system prompt, removes agent thoughts in each step but retains action/observation.
-
-        messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
-        for memory_step in self.memory.steps:
-            messages.extend(memory_step.to_messages(summary_mode=True))
-        return messages
+    # def write_memory_to_messages(
+    #     self,
+    #     summary_mode: bool = False,
+    # ) -> list[ChatMessage]:
+    #     # Modified to reduce memory usage.
+    #     # Keeps system prompt, removes agent thoughts in each step but retains action/observation.
+    #
+    #     messages = self.memory.system_prompt.to_messages(summary_mode=summary_mode)
+    #     for memory_step in self.memory.steps:
+    #         messages.extend(memory_step.to_messages(summary_mode=True))
+    #     return messages
 
     def _step_stream(self, memory_step: ActionStep):
         # Basically wrapped _step_stream to allow for retrying if the model fails to produce a tool call.
