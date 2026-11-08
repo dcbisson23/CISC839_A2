@@ -1,9 +1,12 @@
+import uuid
+
 from sentence_transformers import SentenceTransformer
 from smolagents import TransformersModel, CodeAgent, ToolCallingAgent, Tool, tool, RunResult, ActionStep, ChatMessage, \
     PromptTemplates, PlanningPromptTemplate, ManagedAgentPromptTemplate, FinalAnswerPromptTemplate, MessageRole, \
     TokenUsage
-from smolagents.models import remove_content_after_stop_sequences
-from smolagents.utils import Retrying, AgentParsingError
+from smolagents.models import remove_content_after_stop_sequences, ChatMessageToolCall, parse_json_if_needed, \
+    ChatMessageToolCallFunction
+from smolagents.utils import Retrying, AgentParsingError, parse_json_blob
 import json
 import sqlite3
 import numpy as np
@@ -265,8 +268,47 @@ class CustomAgent(ToolCallingAgent):
                         raise
 
 
+def get_tool_call_from_text(text: str, tool_name_key: str, tool_arguments_key: str) -> ChatMessageToolCall:
+    tool_call_dictionary, _ = parse_json_blob(text)
+    if [key in tool_call_dictionary for key in ["id", "type", "function"]]:
+        tool_id = tool_call_dictionary["id"]
+        tool_type = tool_call_dictionary["type"]
+        tool_func = json.loads(tool_call_dictionary["function"])
+        return ChatMessageToolCall(
+            id=tool_id,
+            type=tool_type,
+            function=ChatMessageToolCallFunction(name=tool_func["name"], arguments=tool_func.get("arguments", None))
+        )
+    try:
+        tool_name = tool_call_dictionary[tool_name_key]
+    except Exception as e:
+        raise ValueError(
+            f"Tool call needs to have a key '{tool_name_key}'. Got keys: {list(tool_call_dictionary.keys())} instead"
+        ) from e
+    tool_arguments = tool_call_dictionary.get(tool_arguments_key, None)
+    if isinstance(tool_arguments, str):
+        tool_arguments = parse_json_if_needed(tool_arguments)
+    return ChatMessageToolCall(
+        id=str(uuid.uuid4()),
+        type="function",
+        function=ChatMessageToolCallFunction(name=tool_name, arguments=tool_arguments),
+    )
+
 class CustomModel(TransformersModel):
     # Straight from TransformersModel class, but removed stop sequences.
+
+    def parse_tool_calls(self, message: ChatMessage) -> ChatMessage:
+        """Sometimes APIs do not return the tool call as a specific object, so we need to parse it."""
+        message.role = MessageRole.ASSISTANT  # Overwrite role if needed
+        if not message.tool_calls:
+            assert message.content is not None, "Message contains no content and no tool calls"
+            message.tool_calls = [
+                get_tool_call_from_text(message.content, self.tool_name_key, self.tool_arguments_key)
+            ]
+        assert len(message.tool_calls) > 0, "No tool call was found in the model output"
+        for tool_call in message.tool_calls:
+            tool_call.function.arguments = parse_json_if_needed(tool_call.function.arguments)
+        return message
     def generate(
         self,
         messages: list[ChatMessage | dict],
