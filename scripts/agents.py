@@ -293,8 +293,9 @@ class CustomModel(TransformersModel):
         else:
             output_text = self.tokenizer.decode(generated_tokens, skip_special_tokens=True)
         if stop_sequences is not None:
-            pass # output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
-        print(output_text)
+            output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
+        if output_text == "":
+            output_text = None
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
