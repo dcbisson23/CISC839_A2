@@ -18,6 +18,7 @@ import sqlvalidator
 import torch
 import gc
 from torch import Tensor
+import json_repair
 
 
 class QueryTool(Tool):
@@ -282,6 +283,7 @@ def parse_json_blob(json_blob: str) -> tuple[dict[str, str|dict], str]:
         first_accolade_index = json_blob.find("{")
         last_accolade_index = [a.start() for a in list(re.finditer("}", json_blob))][-1]
         json_str = json_blob[first_accolade_index : last_accolade_index + 1]
+        json_str = json_repair.repair_json(json_str)
         json_data = json.loads(json_str, strict=False)
         return json_data, json_blob[:first_accolade_index]
     except IndexError:
@@ -374,7 +376,6 @@ class CustomModel(TransformersModel):
         if stop_sequences is not None:
             # output_text = remove_content_after_stop_sequences(output_text, stop_sequences)
             pass
-        output_text = output_text.replace("'", '"')
         del generation_kwargs["inputs"]
         del out
         return ChatMessage(
