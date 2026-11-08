@@ -177,7 +177,6 @@ class TableOrdererTool(Tool):
                 f"Question:\n\t{question}\n"
                 f"{table_strings}")
 
-
 class ExampleRetrieverTool(Tool):
     name = "example_retriever"
     description = ("For a given natural-language question to be converted to an SQL query, "
