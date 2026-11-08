@@ -254,8 +254,10 @@ class CustomAgent(ToolCallingAgent):
                 try:
                     for item in step_stream:
                         step_list.append(item)
+                        del item
                     for item in step_list:
                         yield item
+                        del item
                     break
                 except Exception as e:
                     if isinstance(e, AgentParsingError) and i < self.max_retries:
@@ -264,7 +266,10 @@ class CustomAgent(ToolCallingAgent):
                     else:
                         for item in step_list:
                             yield item
+                            del item
                         raise
+                del step_stream
+                del step_list
 
 
 # Had to change the type hint and that's it.
