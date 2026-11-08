@@ -270,7 +270,13 @@ class CustomAgent(ToolCallingAgent):
 
 def get_tool_call_from_text(text: str, tool_name_key: str, tool_arguments_key: str) -> ChatMessageToolCall:
     tool_call_dictionary, _ = parse_json_blob(text)
-    if [key in tool_call_dictionary for key in ["id", "type", "function"]]:
+    alt_keys = ["id", "type", "function"]
+    not_alt_keys = False
+    for key in alt_keys:
+        if key not in tool_call_dictionary.keys():
+            not_alt_keys = True
+            break
+    if not not_alt_keys:
         tool_id = tool_call_dictionary["id"]
         tool_type = tool_call_dictionary["type"]
         tool_func = json.loads(tool_call_dictionary["function"])
