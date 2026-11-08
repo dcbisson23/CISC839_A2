@@ -374,8 +374,6 @@ class CustomModel(TransformersModel):
         output_text = output_text.replace("'", '"')
         del generation_kwargs["inputs"]
         del out
-        gc.collect()
-        torch.cuda.empty_cache()
         return ChatMessage(
             role=MessageRole.ASSISTANT,
             content=output_text,
