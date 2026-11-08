@@ -244,35 +244,34 @@ class CustomAgent(ToolCallingAgent):
         return messages
 
     def _step_stream(self, memory_step: ActionStep):
-        with torch.cuda.memory.record_annotation("Step stream"):
-            # Basically wrapped _step_stream to allow for retrying if the model fails to produce a tool call.
-            if self.max_retries <= 0:
-                yield from super()._step_stream(memory_step)
-            else:
-                for i in range(0, self.max_retries+2):
-                    step_stream = super()._step_stream(memory_step)
-                    step_list = []
-                    try:
-                        for item in step_stream:
-                            step_list.append(item)
-                            del item
+        # Basically wrapped _step_stream to allow for retrying if the model fails to produce a tool call.
+        if self.max_retries <= 0:
+            yield from super()._step_stream(memory_step)
+        else:
+            for i in range(0, self.max_retries+2):
+                step_stream = super()._step_stream(memory_step)
+                step_list = []
+                try:
+                    for item in step_stream:
+                        step_list.append(item)
+                        del item
+                    for item in step_list:
+                        yield item
+                        del item
+                    break
+                except Exception as e:
+                    if isinstance(e, AgentParsingError) and i < self.max_retries:
+                        if self.logger is not None:
+                            self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
+                    else:
                         for item in step_list:
                             yield item
                             del item
-                        break
-                    except Exception as e:
-                        if isinstance(e, AgentParsingError) and i < self.max_retries:
-                            if self.logger is not None:
-                                self.logger.log(f"Regenerating (attempt {i+1} of {self.max_retries})...")
-                        else:
-                            for item in step_list:
-                                yield item
-                                del item
-                            raise
-                    del step_stream
-                    del step_list
-                    gc.collect()
-                    torch.cuda.empty_cache()
+                        raise
+                del step_stream
+                del step_list
+                gc.collect()
+                torch.cuda.empty_cache()
 
 
 # Had to change the type hint and that's it.
@@ -362,6 +361,7 @@ class CustomModel(TransformersModel):
             tools_to_call_from=tools_to_call_from,
             **kwargs,
         )
+        print(torch.cuda.memory.list_gpu_processes())
         print(messages)
         count_prompt_tokens = generation_kwargs["inputs"].shape[1]  # type: ignore
         out = self.model.generate(
