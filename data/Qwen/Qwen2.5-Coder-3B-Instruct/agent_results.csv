@@ -1,0 +1,136 @@
+id,db_id,hardness,score,num_steps,repeated_actions,input_tokens,output_tokens,total_tokens,start_time,end_time,duration
+0,concert_singer,easy,1,3,{},6705,108,6813,1794189660.7740762,1794189697.1355715,36.36149525642395
+1,concert_singer,easy,0,10,"{'get_relevant_table_data': {'db_id': 'concert_singer', 'question': 'What are all distinct countries where singers above age 20 are from?'}, 'query_db': {""query': 'SELECT DISTINCT T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID WHERE T1.Age > 20', 'db_id"": 'concert_singer'}}",44200,1048,45248,1794189697.4937468,1794189970.7074862,273.2137393951416
+2,concert_singer,medium,0,3,{},6793,136,6929,1794189971.4910548,1794190011.7540324,40.262977600097656
+3,concert_singer,extra,0,3,{},6885,194,7079,1794190012.1082659,1794190060.136367,48.028101205825806
+4,concert_singer,hard,0,3,{},6834,147,6981,1794190060.489677,1794190103.6677358,43.17805886268616
+5,concert_singer,medium,0,10,"{'get_schema': {'db_id': 'concert_singer'}, 'query_db': {'query\': ""SELECT T2.Name, T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID WHERE T1.Song_Name LIKE \'%Hey%\' GROUP BY T2.Name, T2.Country"", \'db_id': 'concert_singer'}}",47420,1254,48674,1794190104.0391753,1794190424.2355046,320.19632935523987
+6,pets_1,easy,0,3,{},7813,154,7967,1794190425.0579896,1794190472.8918371,47.833847522735596
+7,pets_1,hard,0,3,{},7842,158,8000,1794190473.2510755,1794190521.635878,48.38480257987976
+8,pets_1,extra,1,3,{},8263,231,8494,1794190521.9924517,1794190579.2372074,57.24475574493408
+9,pets_1,medium,0,3,{},7954,218,8172,1794190579.5933197,1794190633.883817,54.29049730300903
+10,pets_1,medium,0,3,{},7919,212,8131,1794190634.2326348,1794190688.1082554,53.8756206035614
+11,pets_1,extra,1,3,{},7807,142,7949,1794190688.4829519,1794190734.8508823,46.36793041229248
+12,car_1,easy,0,10,"{'example_retriever': {'question': 'How many continents are there?'}, 'query_db': {""query': 'SELECT count(*) FROM continent', 'db_id"": 'car_1'}, 'get_schema': {'db_id': 'car_1'}}",24150,408,24558,1794190735.2039285,1794190875.7292252,140.52529668807983
+13,car_1,hard,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'Which model of the car has the minimum horsepower?'}, 'query_db': {""query': 'SELECT Model_name FROM car_models ORDER BY Horsepower ASC LIMIT 1;', 'db_id"": 'car_1'}}",25531,509,26040,1794190876.2185168,1794191032.508711,156.290194272995
+14,car_1,hard,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'Which distinct car models are produced after 1980?'}, 'query_db': {""query': 'SELECT DISTINCT Model FROM cars WHERE YEAR > 1980;', 'db_id"": 'car_1'}}",24366,458,24824,1794191033.0203865,1794191178.7306423,145.71025586128235
+15,car_1,medium,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'What is the accelerate of the car make amc hornet sportabout (sw)?'}, 'query_db': {'query\': ""SELECT max(T2.accelerate) FROM cars AS T1 JOIN car_performance AS T2 ON T1.carid = T2.carid WHERE T1.make = \'AMC\' AND T1.model = \'Hornet Sportabout\'"", \'db_id': 'car_1'}}",28011,677,28688,1794191179.2350597,1794191362.0722778,182.83721804618835
+16,car_1,medium,0,10,"{'get_schema': {'db_id': 'car_1'}, 'query_db': {""query': 'SELECT MIN(weight) FROM cars WHERE cylinders = 8 AND YEAR = 1974;', 'db_id"": 'car_1'}}",22429,629,23058,1794191362.631186,1794191518.8411248,156.20993876457214
+17,car_1,medium,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'What is the average weight of cars each year?'}, 'query_db': {""query': 'SELECT avg(weight) FROM Car', 'db_id"": 'car_1'}}",24155,500,24655,1794191519.315509,1794191668.5015998,149.18609070777893
+18,car_1,easy,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'What is the average horsepower of the cars before 1980?'}, 'query_db': {""query': 'SELECT avg(horsepower) FROM cars WHERE year < 1980', 'db_id"": 'car_1'}}",26883,466,27349,1794191668.9871793,1794191824.3382423,155.35106301307678
+19,car_1,easy,0,10,"{'get_schema': {'db_id': 'car_1'}, 'query_db': {""query': 'SELECT COUNT(*) FROM cars WHERE cylinders > 4;', 'db_id"": 'car_1'}}",27343,1649,28992,1794191824.8441553,1794192098.116353,273.2721977233887
+20,car_1,extra,0,10,{None: None},27790,1807,29597,1794192098.6536644,1794193033.9873025,935.3336381912231
+21,car_1,hard,0,10,"{'example_retriever': {'question': 'How many cars have a larger accelerate than the car with the largest horsepower?'}, 'get_schema': {'db_id': 'car_1'}, 'query_db': {""query': 'SELECT COUNT(*) FROM vehicles WHERE accelerate > (SELECT MAX(accelerate) FROM vehicles)', 'db_id"": 'car_1'}}",26167,492,26659,1794193034.5316265,1794193191.1171234,156.58549690246582
+22,car_1,extra,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'Among the cars with more than lowest horsepower, which ones do not have more than 3 cylinders? List the car makeid and make name.'}, 'query_db': {""query': 'SELECT T1.makeid, T1.make_name FROM Cars AS T1 INNER JOIN Veh_make AS T2 ON T1.makeid = T2.makeid WHERE T1.horsepower > (SELECT MIN(horsepower) FROM Cars) AND T1.cylinders <= 3;', 'db_id"": 'car_1'}}",26704,752,27456,1794193191.6162603,1794193375.693769,184.07750868797302
+23,car_1,extra,0,10,"{'get_schema': {'db_id': 'car_1'}, 'example_retriever': {'question': 'Which are the car makers which produce at least 2 models and more than 3 car makers ? List the id and the maker .'}, 'query_db': {""query': 'SELECT T1.id ,  T1.maker FROM car_makers AS T1 JOIN car_models AS T2 ON T1.id  =  T2.maker_id GROUP BY T1.id ,  T1.maker HAVING COUNT(T2.model_id) >= 2 AND COUNT(DISTINCT T1.id) > 3;', 'db_id"": 'car_1'}}",27734,677,28411,1794193376.1948123,1794193556.3632784,180.168466091156
+24,flight_2,easy,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': ""Which country does Airline 'JetBlue Airways' belong to?""}, 'query_db': {'query\': ""SELECT country FROM airlines WHERE airline_name = \'JetBlue Airways\'"", \'db_id': 'flight_2'}}",25314,530,25844,1794193556.8835816,1794193712.612846,155.72926425933838
+25,flight_2,easy,1,4,{},6604,144,6748,1794193713.101616,1794193756.4852846,43.383668661117554
+26,flight_2,easy,1,2,{},2928,86,3014,1794193756.8449802,1794193778.635239,21.790258646011353
+27,flight_2,easy,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': ""How many flights depart from 'APG'? ""}, 'query_db': {'query\': ""SELECT count(*) FROM Flight WHERE origin = \'APG\'"", \'db_id': 'flight_2'}}",24258,431,24689,1794193778.9786303,1794193920.8565235,141.8778932094574
+28,flight_2,hard,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': ""How many flights depart from City 'Aberdeen' and have destination City 'Ashley'? ""}, 'query_db': {'query\': ""SELECT count(*) FROM Flight WHERE departure_city = \'Aberdeen\' AND destination_city = \'Ashley\'"", \'db_id': 'flight_2'}}",25137,511,25648,1794193921.3343358,1794194074.2113554,152.87701964378357
+29,flight_2,hard,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': ""How many United Airlines flights go to City 'Aberdeen'? ""}, 'query_db': {'query\': ""SELECT count(*) FROM Flight WHERE airline = \'United Airlines\' AND destination = \'Aberdeen\'"", \'db_id': 'flight_2'}}",24512,536,25048,1794194074.7014678,1794194227.5041957,152.80272793769836
+30,flight_2,extra,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': 'What is the code of airport that has fewest number of flights?'}, 'query_db': {""query': 'SELECT destination FROM Flight GROUP BY destination ORDER BY count(*) LIMIT 1', 'db_id"": 'flight_2'}}",25658,674,26332,1794194227.9788256,1794194399.1398664,171.16104078292847
+31,flight_2,medium,0,10,"{'query_db': {'query\': ""SELECT DISTINCT Airline FROM Flight WHERE Destination = \'AHD\'"", \'db_id': 'flight_2'}, 'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': ""What are airlines that have flights arriving at airport 'AHD'? ""}}",25456,457,25913,1794194399.636225,1794194548.553577,148.91735196113586
+32,flight_2,medium,0,10,"{'example_retriever': {'question': 'Find all airlines that have fewer than 200 flights.'}, 'get_relevant_table_data': {""db_id': 'flight_2', 'question"": 'Find all airlines that have fewer than 200 flights.'}, 'query_db': {""query': 'SELECT airline_name FROM airlines WHERE num_flights < 200', 'db_id"": 'flight_2'}}",25992,728,26720,1794194549.0467079,1794194726.0123384,176.96563053131104
+33,flight_2,medium,0,10,"{'get_schema': {'db_id': 'flight_2'}, 'example_retriever': {'question': 'What are flight numbers of flights departing from City ""Aberdeen""?'}, 'query_db': {'query\': ""SELECT flno FROM Flight WHERE origin = \'Aberdeen\'"", \'db_id': 'flight_2'}}",24994,454,25448,1794194726.502973,1794194874.0406115,147.53763842582703
+34,employee_hire_evaluation,easy,1,3,{},6559,110,6669,1794194874.5425158,1794194913.4360979,38.8935821056366
+35,employee_hire_evaluation,medium,1,3,{},6679,128,6807,1794194913.8269844,1794194954.989716,41.162731647491455
+36,employee_hire_evaluation,hard,1,3,{},6642,132,6774,1794194955.3475542,1794194996.148247,40.80069279670715
+37,employee_hire_evaluation,extra,0,3,{},6692,172,6864,1794194996.5023043,1794195041.285159,44.78285479545593
+38,employee_hire_evaluation,easy,1,3,{},6678,108,6786,1794195041.630052,1794195080.1588104,38.52875828742981
+39,cre_Doc_Template_Mgt,easy,1,3,{},11283,114,11397,1794195080.5076244,1794195139.6659913,59.15836691856384
+40,cre_Doc_Template_Mgt,easy,0,3,{},11307,126,11433,1794195140.021638,1794195200.1033843,60.081746339797974
+41,cre_Doc_Template_Mgt,easy,1,4,{},16623,220,16843,1794195200.4533513,1794195291.6383128,91.1849615573883
+42,cre_Doc_Template_Mgt,easy,1,3,{},11306,118,11424,1794195291.9968107,1794195350.9818125,58.98500180244446
+43,cre_Doc_Template_Mgt,medium,0,3,{},11465,212,11677,1794195351.3397434,1794195420.0313504,68.6916069984436
+44,cre_Doc_Template_Mgt,medium,1,3,{},11414,176,11590,1794195420.3825674,1794195485.1990023,64.81643486022949
+45,cre_Doc_Template_Mgt,hard,0,3,{},11342,148,11490,1794195485.5503938,1794195547.4196346,61.86924076080322
+46,cre_Doc_Template_Mgt,medium,0,3,{},11334,124,11458,1794195547.7699468,1794195607.5743296,59.80438280105591
+47,cre_Doc_Template_Mgt,medium,0,3,{},11463,202,11665,1794195607.9225988,1794195675.8975172,67.97491836547852
+48,cre_Doc_Template_Mgt,medium,0,6,{},28260,477,28737,1794195676.2630396,1794195842.1822119,165.9191722869873
+49,cre_Doc_Template_Mgt,easy,0,3,{},11348,154,11502,1794195842.549071,1794195905.1113753,62.56230425834656
+50,course_teach,easy,1,3,{},5653,108,5761,1794195905.4605412,1794195940.0021648,34.54162359237671
+51,course_teach,medium,1,3,{},5711,126,5837,1794195940.3560555,1794195977.3236914,36.96763586997986
+52,course_teach,easy,0,3,{},5789,184,5973,1794195977.670238,1794196020.387221,42.71698307991028
+53,course_teach,medium,0,3,{},5844,192,6036,1794196020.7449486,1794196064.7517588,44.00681018829346
+54,museum_visit,easy,1,3,{},5764,120,5884,1794196065.1064785,1794196101.389015,36.28253650665283
+55,museum_visit,medium,1,3,{},5934,188,6122,1794196101.7395627,1794196145.5329235,43.79336071014404
+56,museum_visit,extra,0,5,{},11624,318,11942,1794196145.8832326,1794196225.974953,80.09172034263611
+57,wta_1,easy,0,10,"{'get_schema': {'db_id': 'wta_1'}, 'example_retriever': {'question': 'Find the total number of players.'}, 'query_db': {""query': 'SELECT count(*) FROM player', 'db_id"": 'wta_1'}}",24037,408,24445,1794196226.3471704,1794196365.2345212,138.8873507976532
+58,wta_1,easy,0,10,"{'get_schema': {'db_id': 'wta_1'}, 'example_retriever': {'question': 'Find the average rank of winners in all matches.'}, 'query_db': {""query': 'SELECT AVG(rank) FROM MATCH WHERE winner IS NOT NULL;', 'db_id"": 'wta_1'}}",25363,522,25885,1794196365.7136369,1794196520.02442,154.3107831478119
+59,wta_1,easy,0,10,"{'get_schema': {'db_id': 'wta_1'}, 'example_retriever': {'question': 'Find the name of tourney that has more than 10 matches.'}, 'query_db': {""query': 'SELECT T1.Name FROM Tourney AS T1 JOIN Matches AS T2 ON T1.Tourney_ID = T2.Tourney_ID GROUP BY T1.Name HAVING COUNT(T2.Match_ID) > 10', 'db_id"": 'wta_1'}}",25498,598,26096,1794196520.5122523,1794196683.2500634,162.737811088562
+60,wta_1,medium,0,10,"{'example_retriever': {'question': 'Find the first name and country code of the oldest player.'}, 'query_db': {""query': 'SELECT name_first ,  country_code FROM player ORDER BY age DESC LIMIT 1', 'db_id"": 'wta_1'}, 'get_schema': {'db_id': 'wta_1'}}",25292,713,26005,1794196683.7473161,1794196857.6269946,173.8796784877777
+61,wta_1,hard,0,10,"{'example_retriever': {'question': 'Find the year that has the most number of matches.'}, 'get_relevant_table_data': {""db_id': 'wta_1', 'question"": 'Find the year that has the most number of matches.'}}",25227,572,25799,1794196858.1345649,1794197018.753739,160.61917424201965
+62,wta_1,medium,0,10,"{'get_schema': {'db_id': 'wta_1'}, 'example_retriever': {'question': 'Find the average ranking for each player and their first name.'}, 'query_db': {""query': 'SELECT AVG(T1.ranking) ,  T1.first_name FROM player AS T1 GROUP BY T1.first_name', 'db_id"": 'wta_1'}}",26846,556,27402,1794197019.2375343,1794197184.2544127,165.01687836647034
+63,wta_1,easy,0,10,"{'get_schema': {'db_id': 'wta_1'}, 'example_retriever': {'question': 'Find the codes of countries that have more than 50 players.'}, 'query_db': {""query': 'SELECT country_code FROM country WHERE country_name IN (SELECT birth_country FROM player GROUP BY birth_country HAVING COUNT(*) > 50)', 'db_id"": 'wta_1'}}",26379,502,26881,1794197184.7814515,1794197342.0807142,157.2992627620697
+64,wta_1,medium,0,3,{},4689,330,5019,1794197342.57166,1794197394.942429,52.370769023895264
+65,battle_death,easy,1,3,{},6626,122,6748,1794197395.2880688,1794197435.637788,40.349719285964966
+66,battle_death,hard,0,5,{},13830,347,14177,1794197435.990947,1794197526.6161606,90.62521362304688
+67,student_transcripts_tracking,medium,,,,,,,,,
+68,student_transcripts_tracking,extra,,,,,,,,,
+69,student_transcripts_tracking,medium,,,,,,,,,
+70,student_transcripts_tracking,medium,,,,,,,,,
+71,student_transcripts_tracking,extra,,,,,,,,,
+72,student_transcripts_tracking,extra,,,,,,,,,
+73,student_transcripts_tracking,medium,,,,,,,,,
+74,student_transcripts_tracking,easy,,,,,,,,,
+75,student_transcripts_tracking,hard,,,,,,,,,
+76,student_transcripts_tracking,easy,,,,,,,,,
+77,tvshow,easy,1,3,{},8771,112,8883,1794197621.3564146,1794197668.9195457,47.56313109397888
+78,tvshow,medium,1,3,{},8786,129,8915,1794197669.2688336,1794197717.7472253,48.47839164733887
+79,tvshow,easy,1,3,{},8685,124,8809,1794197718.1112454,1794197765.8396423,47.72839689254761
+80,tvshow,medium,,,,,,,,,
+81,tvshow,medium,,,,,,,,,
+82,tvshow,medium,,,,,,,,,
+83,tvshow,medium,,,,,,,,,
+84,tvshow,easy,,,,,,,,,
+85,poker_player,easy,,,,,,,,,
+86,poker_player,medium,,,,,,,,,
+87,poker_player,medium,,,,,,,,,
+88,poker_player,medium,,,,,,,,,
+89,poker_player,medium,,,,,,,,,
+90,voter_1,easy,,,,,,,,,
+91,voter_1,extra,,,,,,,,,
+92,world_1,easy,,,,,,,,,
+93,world_1,medium,,,,,,,,,
+94,world_1,easy,,,,,,,,,
+95,world_1,medium,,,,,,,,,
+96,world_1,easy,,,,,,,,,
+97,world_1,extra,,,,,,,,,
+98,world_1,medium,,,,,,,,,
+99,world_1,hard,,,,,,,,,
+100,world_1,extra,,,,,,,,,
+101,world_1,extra,,,,,,,,,
+102,world_1,hard,,,,,,,,,
+103,world_1,medium,,,,,,,,,
+104,world_1,medium,,,,,,,,,
+105,world_1,easy,,,,,,,,,
+106,world_1,hard,,,,,,,,,
+107,orchestra,easy,,,,,,,,,
+108,orchestra,easy,,,,,,,,,
+109,orchestra,medium,,,,,,,,,
+110,orchestra,medium,,,,,,,,,
+111,orchestra,hard,,,,,,,,,
+112,network_1,easy,,,,,,,,,
+113,network_1,easy,,,,,,,,,
+114,network_1,hard,,,,,,,,,
+115,network_1,extra,,,,,,,,,
+116,network_1,hard,,,,,,,,,
+117,network_1,medium,,,,,,,,,
+118,network_1,hard,,,,,,,,,
+119,dog_kennels,hard,,,,,,,,,
+120,dog_kennels,hard,,,,,,,,,
+121,dog_kennels,extra,,,,,,,,,
+122,dog_kennels,medium,,,,,,,,,
+123,dog_kennels,medium,,,,,,,,,
+124,dog_kennels,medium,,,,,,,,,
+125,dog_kennels,easy,,,,,,,,,
+126,dog_kennels,hard,,,,,,,,,
+127,dog_kennels,extra,,,,,,,,,
+128,dog_kennels,medium,,,,,,,,,
+129,dog_kennels,medium,,,,,,,,,
+130,singer,easy,,,,,,,,,
+131,singer,medium,,,,,,,,,
+132,singer,medium,,,,,,,,,
+133,singer,medium,,,,,,,,,
+134,real_estate_properties,easy,,,,,,,,,

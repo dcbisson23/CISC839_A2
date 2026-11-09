@@ -1,0 +1,118 @@
+id,db_id,hardness,question,prediction,gold
+8,concert_singer,easy,What are all distinct countries where singers above age 20 are from?,"SELECT DISTINCT T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID WHERE T1.Age > 20
+","SELECT DISTINCT country FROM singer WHERE age  >  20	concert_singer
+"
+16,concert_singer,medium,What is the maximum capacity and the average of all stadiums ?,"SELECT MAX(Capacity), AVG(Capacity) FROM stadium
+","select max(capacity), average from stadium	concert_singer
+"
+32,concert_singer,hard,What are the names of all stadiums that did not have a concert in 2014?,"SELECT Name FROM stadium WHERE Stadium_ID NOT IN (SELECT Stadium_ID FROM concert WHERE YEAR = '2014')
+","SELECT name FROM stadium EXCEPT SELECT T2.name FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id  =  T2.stadium_id WHERE T1.year  =  2014	concert_singer
+"
+40,concert_singer,medium,What is the name and country of origin of every singer who has a song with the word 'Hey' in its title?,"SELECT T2.Name, T2.Country FROM singer AS T1 INNER JOIN singer_in_concert AS T3 ON T1.Singer_ID = T3.Singer_ID INNER JOIN concert AS T4 ON T3.concert_ID = T4.concert_ID INNER JOIN stadium AS T5 ON T4.Stadium_ID = T5.Stadium_ID INNER JOIN song AS T6 ON T4.concert_ID = T6.concert_ID WHERE T6.Song_Name LIKE '%Hey%' GROUP BY T1.Singer_ID;
+","SELECT name ,  country FROM singer WHERE song_name LIKE '%Hey%'	concert_singer
+"
+61,pets_1,extra,Find the major and age of students who do not have a cat pet.,"SELECT S.Major, S.Age FROM Student S WHERE S.StuID NOT IN (SELECT H.StuID FROM Has_Pet H JOIN Pets P ON H.PetID = P.PetID WHERE P.PetType = 'Cat')
+","SELECT major ,  age FROM student WHERE stuid NOT IN (SELECT T1.stuid FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat')	pets_1
+"
+95,car_1,hard,Which model of the car has the minimum horsepower?,"SELECT Model FROM model_list WHERE Id = (SELECT Model FROM cars_data ORDER BY Horsepower ASC LIMIT 1)
+","SELECT T1.Model FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id ORDER BY T2.horsepower ASC LIMIT 1;	car_1
+"
+103,car_1,hard,Which distinct car models are the produced after 1980?,"SELECT DISTINCT T3.Model FROM cars_data AS T1 INNER JOIN model_list AS T2 ON T1.Model = T2.ModelId INNER JOIN car_makers AS T3 ON T2.Maker = T3.Id WHERE T1.Year > 1980
+","SELECT DISTINCT T1.model FROM MODEL_LIST AS T1 JOIN CAR_NAMES AS T2 ON T1.model  =  T2.model JOIN CARS_DATA AS T3 ON T2.MakeId  =  T3.id WHERE T3.year  >  1980;	car_1
+"
+111,car_1,medium,What is the accelerate of the car make amc hornet sportabout (sw)?,"SELECT T3.Accelerate FROM car_makers AS T1 INNER JOIN model_list AS T2 ON T1.Id = T2.Maker INNER JOIN car_names AS T3 ON T2.Model = T3.Model WHERE T1.Maker = 'AMC' AND T3.Make = 'Hornet Sportabout';
+","SELECT T1.Accelerate FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId WHERE T2.Make  =  'amc hornet sportabout (sw)';	car_1
+"
+151,car_1,extra,Which distinctive models are produced by maker with the full name General Motors or weighing more than 3500?,"SELECT T1.Model FROM model_list AS T1 INNER JOIN car_makers AS T2 ON T1.Maker = T2.Id WHERE T2.FullName = 'General Motors' OR T1.MakeId IN (SELECT MakeId FROM cars_data WHERE Weight > 3500)
+","SELECT DISTINCT T2.Model FROM CAR_NAMES AS T1 JOIN MODEL_LIST AS T2 ON T1.Model  =  T2.Model JOIN CAR_MAKERS AS T3 ON T2.Maker  =  T3.Id JOIN CARS_DATA AS T4 ON T1.MakeId  =  T4.Id WHERE T3.FullName  =  'General Motors' OR T4.weight  >  3500;	car_1
+"
+159,car_1,hard,How many cars have a larger accelerate than the car with the largest horsepower?,"SELECT COUNT(*) FROM cars_data WHERE Accelerate > ( SELECT MAX(Accelerate) FROM cars_data )
+","SELECT COUNT(*) FROM CARS_DATA WHERE Accelerate  >  ( SELECT Accelerate FROM CARS_DATA ORDER BY Horsepower DESC LIMIT 1 );	car_1
+"
+167,car_1,extra,"Among the cars with more than lowest horsepower, which ones do not have more than 3 cylinders? List the car makeid and make name.","SELECT T1.MakeId, T1.Make FROM car_names AS T1 JOIN model_list AS T2 ON T1.Model = T2.Model JOIN car_makers AS T3 ON T2.Maker = T3.Id WHERE T3.Horsepower > (SELECT MIN(Horsepower) FROM car_makers) AND T1.Cylinders <= 3;
+","SELECT T2.MakeId ,  T2.Make FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId WHERE T1.Horsepower  >  (SELECT min(Horsepower) FROM CARS_DATA) AND T1.Cylinders  <=  3;	car_1
+"
+175,car_1,extra,Which are the car makers which produce at least 2 models and more than 3 car makers ? List the id and the maker .,"SELECT Maker, Id FROM car_makers WHERE Id IN ( SELECT Maker FROM model_list GROUP BY Maker HAVING COUNT(*) >= 2 ) AND Id IN ( SELECT Maker FROM car_makers GROUP BY Maker HAVING COUNT(*) > 3 )
+","select t1.id ,  t1.maker from car_makers as t1 join model_list as t2 on t1.id  =  t2.maker group by t1.id having count(*)  >=  2 intersect select t1.id ,  t1.maker from car_makers as t1 join model_list as t2 on t1.id  =  t2.maker join car_names as t3 on t2.model  =  t3.model group by t1.id having count(*)  >  3;	car_1
+"
+179,flight_2,easy,"Which country does Airline ""JetBlue Airways"" belong to?","SELECT T2.Country FROM airlines AS T1 INNER JOIN airports AS T2 ON T1.uid = T2.Airline WHERE T1.Airline = 'JetBlue Airways'
+","SELECT Country FROM AIRLINES WHERE Airline  =  ""JetBlue Airways""	flight_2
+"
+227,flight_2,extra,What is the code of airport that has fewest number of flights?,"SELECT AirportCode FROM airports WHERE AirportCode IN ( SELECT SourceAirport FROM flights GROUP BY SourceAirport ORDER BY COUNT(*) ASC LIMIT 1 ) UNION ALL SELECT AirportCode FROM airports WHERE AirportCode IN ( SELECT DestAirport FROM flights GROUP BY DestAirport ORDER BY COUNT(*) ASC LIMIT 1 );
+","SELECT T1.AirportCode FROM AIRPORTS AS T1 JOIN FLIGHTS AS T2 ON T1.AirportCode  =  T2.DestAirport OR T1.AirportCode  =  T2.SourceAirport GROUP BY T1.AirportCode ORDER BY count(*) LIMIT 1	flight_2
+"
+243,flight_2,medium,Find all airlines that have fewer than 200 flights.,"SELECT Airline FROM airlines WHERE uid IN (SELECT Airline FROM flights GROUP BY Airline HAVING COUNT(*) < 200)
+","SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline GROUP BY T1.Airline HAVING count(*)  <  200	flight_2
+"
+329,cre_Doc_Template_Mgt,medium,Show all template type codes and number of templates for each.,"SELECT Template_Type_Code, COUNT(*) AS Number_of_Templates FROM Templates JOIN Ref_Template_Types ON Templates.Template_Type_Code = Ref_Template_Types.Template_Type_Code GROUP BY Template_Type_Code;
+","SELECT template_type_code ,  count(*) FROM Templates GROUP BY template_type_code	cre_Doc_Template_Mgt
+"
+345,cre_Doc_Template_Mgt,hard,Show all template type codes that are not used by any document.,"SELECT Template_Type_Code FROM Ref_Template_Types WHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates)
+","SELECT template_type_code FROM Templates EXCEPT SELECT template_type_code FROM Templates AS T1 JOIN Documents AS T2 ON T1.template_id  =  T2.template_id	cre_Doc_Template_Mgt
+"
+353,cre_Doc_Template_Mgt,medium,What are the distinct template type descriptions for the templates ever used by any document?,"SELECT DISTINCT T2.Template_Type_Description FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID
+","SELECT DISTINCT T1.template_type_description FROM Ref_template_types AS T1 JOIN Templates AS T2 ON T1.template_type_code  = T2.template_type_code JOIN Documents AS T3 ON T2.Template_ID  =  T3.template_ID	cre_Doc_Template_Mgt
+"
+361,cre_Doc_Template_Mgt,medium,Show paragraph details for paragraph with text 'Korea ' .,"SELECT Paragraph_Text, Other_Details FROM Paragraphs WHERE Paragraph_Text = 'Korea ';
+","select other_details from paragraphs where paragraph_text like 'korea'	cre_Doc_Template_Mgt
+"
+405,course_teach,medium,Show names of teachers and the number of courses they teach.,"SELECT T.Name, COUNT(C.Course_ID) AS NumberOfCourses FROM teacher AS T JOIN course_arrange AS CA ON T.Teacher_ID = CA.Teacher_ID GROUP BY T.Name;
+","SELECT T2.Name ,  COUNT(*) FROM course_arrange AS T1 JOIN teacher AS T2 ON T1.Teacher_ID  =  T2.Teacher_ID GROUP BY T2.Name	course_teach
+"
+485,wta_1,medium,How many different winners both participated in the WTA Championships and were left handed?,"SELECT COUNT(DISTINCT T1.winner_id) FROM matches AS T1 INNER JOIN players AS T2 ON T1.winner_id = T2.player_id WHERE T2.hand = 'L' AND T1.tourney_name = 'WTA Championships'
+","SELECT count(DISTINCT winner_name) FROM matches WHERE tourney_name  =  'WTA Championships' AND winner_hand  =  'L'	wta_1
+"
+499,battle_death,hard,What are the ids and names of the battles that led to more than 10 people killed in total.,"SELECT DISTINCT b.id, b.name FROM battle b JOIN death d ON b.id = d.caused_by_ship_id GROUP BY b.id HAVING SUM(d.killed) > 10;
+","SELECT T1.id ,  T1.name FROM battle AS T1 JOIN ship AS T2 ON T1.id  =  T2.lost_in_battle JOIN death AS T3 ON T2.id  =  T3.caused_by_ship_id GROUP BY T1.id HAVING sum(T3.killed)  >  10	battle_death
+"
+515,student_transcripts_tracking,extra,Which department offers the most number of degrees? List department name and id.,"SELECT T2.department_name, T2.department_id FROM Degree_Programs AS T1 INNER JOIN Departments AS T2 ON T1.department_id = T2.department_id GROUP BY T2.department_name ORDER BY COUNT(T1.degree_program_id) DESC LIMIT 1;
+","SELECT T2.department_name ,  T1.department_id FROM Degree_Programs AS T1 JOIN Departments AS T2 ON T1.department_id  =  T2.department_id GROUP BY T1.department_id ORDER BY count(*) DESC LIMIT 1	student_transcripts_tracking
+"
+539,student_transcripts_tracking,extra,Find the program which most number of students are enrolled in. List both the id and the summary.,"SELECT degree_program_id, degree_summary_name FROM Degree_Programs JOIN Student_Enrolment ON Degree_Programs.degree_program_id = Student_Enrolment.degree_program_id GROUP BY degree_program_id, degree_summary_name ORDER BY COUNT(student_id) DESC LIMIT 1;
+","SELECT T1.degree_program_id ,  T1.degree_summary_name FROM Degree_Programs AS T1 JOIN Student_Enrolment AS T2 ON T1.degree_program_id  =  T2.degree_program_id GROUP BY T1.degree_program_id ORDER BY count(*) DESC LIMIT 1	student_transcripts_tracking
+"
+547,student_transcripts_tracking,extra,What's the name of the course with most number of enrollments?,"SELECT T1.course_name FROM Courses AS T1 INNER JOIN Student_Enrolment_Courses AS T2 ON T1.course_id = T2.course_id GROUP BY T2.course_id ORDER BY COUNT(T2.student_course_id) DESC LIMIT 1
+","SELECT  T1.course_name FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id  =  T2.course_id GROUP BY T1.course_name ORDER BY count(*) DESC LIMIT 1	student_transcripts_tracking
+"
+579,student_transcripts_tracking,easy,List all the student details in reversed lexicographical order.,"SELECT * FROM Students ORDER BY last_name DESC, first_name DESC;
+","SELECT other_student_details FROM Students ORDER BY other_student_details DESC	student_transcripts_tracking
+"
+625,tvshow,medium,"List the Episode of all  TV series showed on TV Channel with series name ""Sky Radio"".","SELECT Episode FROM TV_series WHERE Channel = (SELECT id FROM TV_Channel WHERE series_name = 'Sky Radio')
+","SELECT T2.Episode FROM TV_Channel AS T1 JOIN TV_series AS T2 ON T1.id = T2.Channel WHERE T1.series_name = ""Sky Radio"";	tvshow
+"
+641,tvshow,easy,find id of the tv channels that from the countries where have more than two tv channels.,"SELECT Country FROM TV_Channel GROUP BY Country HAVING COUNT(*) > 2;
+","SELECT id FROM tv_channel GROUP BY country HAVING count(*)  >  2	tvshow
+"
+663,poker_player,medium,List the names of poker players ordered by the final tables made in ascending order.,"SELECT Name FROM poker_player ORDER BY Final_Table_Made ASC
+","SELECT T1.Name FROM people AS T1 JOIN poker_player AS T2 ON T1.People_ID  =  T2.People_ID ORDER BY T2.Final_Table_Made	poker_player
+"
+766,world_1,extra,What is the total number of people living in the nations that do not use English?,"SELECT SUM(T2.Population) FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language != 'English'
+","SELECT sum(Population) FROM country WHERE Name NOT IN (SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  ""English"")	world_1
+"
+774,world_1,extra,What are the African countries that have a  population less than any country in Asia?,"SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T1.Continent = 'Africa' AND T1.Population < ALL (SELECT MIN(Population) FROM country WHERE Continent = 'Asia');
+","SELECT Name FROM country WHERE Continent  =  ""Africa""  AND population  <  (SELECT max(population) FROM country WHERE Continent  =  ""Asia"")	world_1
+"
+782,world_1,hard,What are the codes of the countries that do not speak English and whose government forms are not Republic?,"SELECT T1.Code FROM country AS T1 INNER JOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode WHERE T2.Language != 'English' AND T1.GovernmentForm != 'Republic'
+","SELECT Code FROM country WHERE GovernmentForm != ""Republic"" EXCEPT SELECT CountryCode FROM countrylanguage WHERE LANGUAGE  =  ""English""	world_1
+"
+790,world_1,medium,"What are the population, name and leader of the country with the largest area?","SELECT T2.Population, T1.Name, T1.HeadOfState FROM country AS T1 INNER JOIN city AS T2 ON T1.Code = T2.CountryCode ORDER BY T1.SurfaceArea DESC LIMIT 1;
+","SELECT Name ,  population ,  HeadOfState FROM country ORDER BY SurfaceArea DESC LIMIT 1	world_1
+"
+894,network_1,hard,Show ids of all students who do not have any friends.,"SELECT ID FROM Highschooler WHERE ID NOT IN (SELECT friend_id FROM Friend)
+","SELECT id FROM Highschooler EXCEPT SELECT student_id FROM Friend	network_1
+"
+918,dog_kennels,hard,Which states have both owners and professionals living there?,"SELECT T1.state FROM Owners AS T1 INNER JOIN Professionals AS T2 ON T1.owner_id = T2.professional_id GROUP BY T1.state HAVING COUNT(DISTINCT T1.owner_id) > 0 AND COUNT(DISTINCT T2.professional_id) > 0;
+","SELECT state FROM Owners INTERSECT SELECT state FROM Professionals	dog_kennels
+"
+926,dog_kennels,hard,Which first names are used for professionals or owners but are not used as dog names?,"SELECT T1.first_name FROM Owners AS T1 INNER JOIN Dogs AS T2 ON T1.owner_id = T2.owner_id UNION SELECT T1.first_name FROM Professionals AS T1 INNER JOIN Dogs AS T2 ON T1.professional_id = T2.dog_id EXCEPT SELECT T1.name FROM Dogs AS T1
+","SELECT first_name FROM Professionals UNION SELECT first_name FROM Owners EXCEPT SELECT name FROM Dogs	dog_kennels
+"
+950,dog_kennels,medium,"List each owner's first name, last name, and the size of his for her dog.","SELECT Owners.first_name, Owners.last_name, Sizes.size_description FROM Owners JOIN Dogs ON Owners.owner_id = Dogs.owner_id JOIN Sizes ON Dogs.size_code = Sizes.size_code;
+","SELECT T1.first_name ,  T1.last_name ,  T2.size_code FROM Owners AS T1 JOIN Dogs AS T2 ON T1.owner_id  =  T2.owner_id	dog_kennels
+"
+966,dog_kennels,easy,How many dogs went through any treatments?,"SELECT COUNT(*) FROM Dogs WHERE dog_id IN (SELECT dog_id FROM Treatments)
+","SELECT count(DISTINCT dog_id) FROM Treatments	dog_kennels
+"
+1024,singer,medium,Show the names of singers and the total sales of their songs.,"SELECT s.Name, SUM(s.song.Sales) as Total_Sales FROM singer s JOIN song ON s.Singer_ID = song.Singer_ID GROUP BY s.Name;
+","SELECT T1.Name ,  sum(T2.Sales) FROM singer AS T1 JOIN song AS T2 ON T1.Singer_ID  =  T2.Singer_ID GROUP BY T1.Name	singer
+"

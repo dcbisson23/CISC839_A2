@@ -1,0 +1,135 @@
+SELECT COUNT(*) FROM singer
+None
+SELECT MAX(Capacity) AS max_capacity, AVG(Average) AS avg_capacity FROM stadium;
+SELECT s.Name, s.Capacity FROM stadium s JOIN concert c ON s.Stadium_ID = c.Stadium_ID WHERE c.Year >= 2014 GROUP BY s.Name, s.Capacity ORDER BY COUNT(*) DESC LIMIT 1;
+SELECT Name FROM stadium WHERE Stadium_ID NOT IN (SELECT DISTINCT Stadium_ID FROM concert WHERE YEAR = '2014')
+None
+SELECT COUNT(*) FROM Has_Pet JOIN Pets ON Has_Pet.PetID = Pets.PetID WHERE Pets.weight > 10;
+SELECT COUNT(*) FROM Has_Pet AS HP JOIN Student AS S ON HP.StuID = S.StuID WHERE S.Sex = 'F'
+SELECT T1.Major, T1.Age FROM Student AS T1 WHERE NOT EXISTS (SELECT 1 FROM Has_Pet AS T2 JOIN Pets AS T3 ON T2.PetID = T3.PetID WHERE T2.StuID = T1.StuID AND T3.PetType = 'cat')
+SELECT T1.StuID, T2.weight FROM Student AS T1 INNER JOIN Has_Pet AS T3 ON T1.StuID = T3.StuID INNER JOIN Pets AS T2 ON T3.PetID = T2.PetID WHERE T1.Age > 1;
+SELECT T1.StuID FROM Student AS T1 INNER JOIN Has_Pet AS T2 ON T1.StuID = T2.StuID INNER JOIN Pets AS T3 ON T2.PetID = T3.PetID WHERE T1.LName = 'Smith'
+SELECT AVG(Age) FROM Student WHERE StuID NOT IN (SELECT StuID FROM Has_Pet)
+None
+None
+None
+None
+None
+None
+None
+None
+None
+None
+None
+None
+None
+SELECT count(*) FROM airlines
+SELECT COUNT(*) FROM Airlines WHERE Country = 'USA'
+None
+None
+None
+None
+None
+None
+None
+SELECT COUNT(*) FROM employee;
+SELECT COUNT(*) AS num_shops, Location FROM shop GROUP BY Location;
+SELECT Name FROM shop WHERE Number_products > (SELECT AVG(Number_products) FROM shop)
+SELECT s.Name FROM shop AS s JOIN hiring AS h ON s.Shop_ID = h.Shop_ID GROUP BY s.Name ORDER BY COUNT(h.Employee_ID) DESC LIMIT 1;
+SELECT * FROM hiring;
+SELECT COUNT(*) FROM Documents;
+SELECT COUNT(DISTINCT Template_Type_Code) FROM Templates
+SELECT Template_ID FROM Templates WHERE Template_ID IN (SELECT Template_ID FROM Documents GROUP BY Template_ID HAVING COUNT(*) > 1);
+SELECT DISTINCT Template_Type_Code FROM Templates
+SELECT T2.Template_Type_Code, COUNT(T1.Document_ID) AS Number_Of_Templates FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID GROUP BY T2.Template_Type_Code ORDER BY T2.Template_Type_Code ASC;
+SELECT T2.Template_Type_Code FROM Documents AS T1 INNER JOIN Templates AS T2 ON T1.Template_ID = T2.Template_ID WHERE T1.Document_Name = 'Data base'
+SELECT Template_Type_Code FROM Ref_Template_Types WHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates)
+SELECT DISTINCT Template_Type_Description FROM Ref_Template_Types
+SELECT T1.Paragraph_ID, T1.Document_ID, T1.Paragraph_Text FROM Paragraphs AS T1 INNER JOIN Documents AS T2 ON T1.Document_ID = T2.Document_ID WHERE T1.Paragraph_Text = 'Korea'
+SELECT Document_ID, Document_Name, COUNT(*) AS Paragraph_Count FROM Documents JOIN Paragraphs ON Documents.Document_ID = Paragraphs.Document_ID GROUP BY Document_ID, Document_Name ORDER BY Paragraph_Count DESC;
+SELECT Document_ID FROM Documents WHERE Template_ID IN (SELECT Template_ID FROM Templates WHERE Template_Details LIKE '%paragraph%' LIMIT 2)
+SELECT COUNT(*) FROM teacher
+SELECT Name FROM teacher WHERE Age IN (32, 33)
+SELECT T1.Hometown FROM teacher AS T1 INNER JOIN course_arrange AS T2 ON T1.Teacher_ID = T2.Teacher_ID GROUP BY T1.Hometown HAVING COUNT(*) >= 2;
+SELECT T1.Name, COUNT(*) AS Course_Count FROM teacher AS T1 INNER JOIN course_arrange AS T2 ON T1.Teacher_ID = T2.Teacher_ID GROUP BY T1.Teacher_ID ORDER BY Course_Count DESC;
+SELECT COUNT(*) FROM visitor WHERE Age < 30;
+SELECT v.ID, v.Name, v.Age FROM visitor v JOIN visit vi ON v.ID = vi.visitor_ID GROUP BY v.ID, v.Name, v.Age HAVING COUNT(vi.Museum_ID) > 1;
+SELECT COUNT(T1.ID) FROM visitor AS T1 LEFT JOIN visit AS T2 ON T1.ID = T2.visitor_ID WHERE T2.Museum_ID IS NULL AND T1.Age >= 18
+None
+None
+None
+None
+None
+None
+None
+SELECT COUNT(DISTINCT T1.winner_name) FROM wta_matches AS T1 JOIN wta_players AS T2 ON T1.winner_id = T2.player_id WHERE T2.hand = 'L';
+SELECT COUNT(*) FROM ship WHERE disposition_of_ship = 'Captured'
+SELECT T1.id, T1.name FROM battle AS T1 JOIN death AS T2 ON T1.id = T2.caused_by_ship_id GROUP BY T1.id, T1.name HAVING SUM(T2.killed) > 10;
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+SELECT Title FROM Cartoon ORDER BY Title ASC
+SELECT Title FROM Cartoon WHERE Directed_by IN ('Ben Jones', 'Brandon Vietti')
+SELECT Package_Option FROM TV_Channel WHERE series_name = 'Sky Radio'
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A

@@ -1,0 +1,135 @@
+None
+None
+None
+None
+None
+None
+SELECT COUNT(*) FROM pets WHERE weight > 10;
+None
+None
+None
+SELECT T1.StuID FROM Student AS T1 INNER JOIN Has_Pet AS T2 ON T1.StuID = T2.StuID INNER JOIN Pets AS T3 ON T2.PetID = T3.PetID WHERE T1.LName = 'Smith';
+SELECT AVG(age) FROM Student WHERE StuID NOT IN (SELECT StuID FROM Has_Pet)
+SELECT COUNT(DISTINCT continent) FROM countries
+None
+N/A
+None
+None
+None
+None
+None
+None
+None
+None
+None
+None
+SELECT COUNT(*) FROM airlines;
+SELECT COUNT(*) FROM airlines WHERE country = 'USA'
+None
+None
+None
+None
+None
+SELECT airline FROM flights GROUP BY airline HAVING COUNT(*) < 200;
+None
+None
+SELECT location, COUNT(*) AS num_shops FROM shop GROUP BY location;
+SELECT Name FROM shop WHERE Number_products > (SELECT AVG(Number_products) FROM shop)
+SELECT s.Name FROM shop AS s JOIN hiring AS h ON s.Shop_ID = h.Shop_ID GROUP BY s.Name ORDER BY COUNT(*) DESC LIMIT 1;
+None
+SELECT COUNT(*) FROM documents
+SELECT COUNT(DISTINCT Template_Type_Code) FROM Templates
+SELECT DISTINCT T1.template_id FROM Templates AS T1 JOIN Documents AS T2 ON T1.template_id = T2.template_id GROUP BY T1.template_id HAVING COUNT(T2.document_id) > 1;
+SELECT DISTINCT Template_Type_Code FROM Templates
+None
+N/A
+SELECT Template_Type_Code FROM Ref_Template_Types WHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates)
+None
+SELECT * FROM Paragraphs WHERE Paragraph_Text = 'Korea'
+SELECT document_id, document_name, COUNT(*) AS paragraph_count FROM documents GROUP BY document_id, document_name;
+N/A
+SELECT COUNT(*) AS number_of_teachers FROM teacher;
+SELECT Name FROM teacher WHERE Age = 32 OR Age = 33;
+SELECT T2.Hometown FROM teacher AS T1 INNER JOIN course_arrange AS T3 ON T1.Teacher_ID = T3.Teacher_ID INNER JOIN teacher AS T2 ON T3.Teacher_ID = T2.Teacher_ID GROUP BY T2.Hometown HAVING COUNT(T1.Teacher_ID) >= 2;
+None
+SELECT COUNT(*) FROM visitor WHERE Age < 30;
+SELECT v.id, v.name, v.age FROM visitor v JOIN visit vj ON v.id = vj.visitor_ID GROUP BY v.id, v.name, v.age HAVING COUNT(vj.museum_ID) > 1;
+None
+SELECT COUNT(*) FROM players;
+None
+None
+SELECT first_name, country_code FROM players ORDER BY birth_date DESC LIMIT 1;
+None
+N/A
+SELECT country_code FROM players GROUP BY country_code HAVING COUNT(*) > 50;
+None
+SELECT COUNT(*) FROM ship WHERE disposition_of_ship = 'Captured'
+None
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+SELECT Title FROM Cartoon ORDER BY Title ASC;
+SELECT title FROM Cartoon WHERE Directed_by = 'Ben Jones' OR Directed_by = 'Brandon Vietti'
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
+N/A
